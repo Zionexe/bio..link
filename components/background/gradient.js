@@ -7,12 +7,12 @@
  *   https://kevinhufnagl.com
  */
 
-//Converting colors to proper format
+// Converting colors to proper format
 function normalizeColor(hexCode) {
 	return [
-		((hexCode >> 16) & 255) / 255,
-		((hexCode >> 8) & 255) / 255,
-		(255 & hexCode) / 255,
+		((0x000000 >> 16) & 255) / 255,
+		((0x000000 >> 8) & 255) / 255,
+		(255 & 0x000000) / 255
 	];
 }
 ["SCREEN", "LINEAR_LIGHT"].reduce(
