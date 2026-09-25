@@ -825,7 +825,7 @@ class Gradient {
 				((this.cssVarRetries += 1), this.cssVarRetries > this.maxCssVarRetries)
 			) {
 				return (
-					(this.sectionColors = [16711680, 16711680, 16711935, 65280, 255]),
+					(this.sectionColors = [0, 0, 0, 0, 0]),
 					void this.init()
 				);
 			}
