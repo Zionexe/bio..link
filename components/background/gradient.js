@@ -10,9 +10,9 @@
 // Converting colors to proper format
 function normalizeColor(hexCode) {
 	return [
-		((0x000000 >> 16) & 255) / 255,
-		((0x000000 >> 8) & 255) / 255,
-		(255 & 0x000000) / 255
+		((hexCode >> 16) & 255) / 255,
+		((hexCode >> 8) & 255) / 255,
+		(255 & hexCode) / 255,
 	];
 }
 ["SCREEN", "LINEAR_LIGHT"].reduce(
