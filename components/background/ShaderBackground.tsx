@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -14,18 +15,19 @@ export default function ShaderBackground({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvasElement = canvasRef.current;
 
-    const context = canvas.getContext('webgl2', {
+    if (!canvasElement) return;
+
+    const glContext = canvasElement.getContext('webgl2', {
       alpha: true,
       antialias: false,
     });
 
-    if (!context) return;
+    if (!glContext) return;
 
-    // From this point on TypeScript knows this is non-null.
-    const gl: WebGL2RenderingContext = context;
+    const gl = glContext;
+    const canvas = canvasElement;
 
     const RES_W = 640;
     const RES_H = 360;
@@ -66,23 +68,19 @@ out vec4 fragColor;
 
 void main() {
   float t = iTime / 4.;
+
   vec3 d = -.2 * vec3(vScreen, 1.);
   vec3 c = vec3(0.);
   float dist = 0.;
 
-  for (int i = 0; i < 55; ++i) {
-    if (float(i) >= iterations) break;
-
+  for (int i = 0; i < int(iterations); ++i) {
     vec3 p = c;
 
     dist += distStep;
-
     p.z -= t + dist;
     p.z *= rotZoom;
 
-    p.xy *= mat2(
-      sin(p.z + vec4(0., 11., 20., 0.))
-    );
+    p.xy *= mat2(sin(p.z + vec4(0., 11., 20., 0.)));
 
     c += length(
       sin(p.yx * .65) +
@@ -90,21 +88,18 @@ void main() {
     ) * d;
   }
 
-  fragColor = vec4(
-    2.5 * color / length(c),
-    1.
-  );
+  fragColor = vec4(2.5 * color / length(c), 1.);
 }`;
 
     function compile(
       type: number,
-      src: string
+      source: string
     ): WebGLShader | null {
       const shader = gl.createShader(type);
 
       if (!shader) return null;
 
-      gl.shaderSource(shader, src);
+      gl.shaderSource(shader, source);
       gl.compileShader(shader);
 
       if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -116,60 +111,48 @@ void main() {
       return shader;
     }
 
-    const vs = compile(
-      gl.VERTEX_SHADER,
-      VERT
-    );
+    const vertexShader = compile(gl.VERTEX_SHADER, VERT);
+    const fragmentShader = compile(gl.FRAGMENT_SHADER, FRAG);
 
-    const fs = compile(
-      gl.FRAGMENT_SHADER,
-      FRAG
-    );
-
-    if (!vs || !fs) {
-      if (vs) gl.deleteShader(vs);
-      if (fs) gl.deleteShader(fs);
+    if (!vertexShader || !fragmentShader) {
       return;
     }
 
-    const prog = gl.createProgram();
+    const program = gl.createProgram();
 
-    if (!prog) {
-      gl.deleteShader(vs);
-      gl.deleteShader(fs);
+    if (!program) {
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
       return;
     }
 
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
 
-    gl.linkProgram(prog);
+    gl.linkProgram(program);
 
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-      console.error(gl.getProgramInfoLog(prog));
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error(gl.getProgramInfoLog(program));
 
-      gl.deleteProgram(prog);
-      gl.deleteShader(vs);
-      gl.deleteShader(fs);
+      gl.deleteProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
 
       return;
     }
 
-    gl.useProgram(prog);
+    gl.useProgram(program);
 
-    const buf = gl.createBuffer();
+    const buffer = gl.createBuffer();
 
-    if (!buf) {
-      gl.deleteProgram(prog);
-      gl.deleteShader(vs);
-      gl.deleteShader(fs);
+    if (!buffer) {
+      gl.deleteProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
       return;
     }
 
-    gl.bindBuffer(
-      gl.ARRAY_BUFFER,
-      buf
-    );
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 
     gl.bufferData(
       gl.ARRAY_BUFFER,
@@ -182,28 +165,23 @@ void main() {
       gl.STATIC_DRAW
     );
 
-    const loc = gl.getAttribLocation(
-      prog,
+    const positionLocation = gl.getAttribLocation(
+      program,
       'position'
     );
 
-    if (loc === -1) {
-      console.error(
-        'Could not find position attribute.'
-      );
-
-      gl.deleteBuffer(buf);
-      gl.deleteProgram(prog);
-      gl.deleteShader(vs);
-      gl.deleteShader(fs);
-
+    if (positionLocation < 0) {
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
       return;
     }
 
-    gl.enableVertexAttribArray(loc);
+    gl.enableVertexAttribArray(positionLocation);
 
     gl.vertexAttribPointer(
-      loc,
+      positionLocation,
       2,
       gl.FLOAT,
       false,
@@ -211,55 +189,32 @@ void main() {
       0
     );
 
-    const u = (name: string) =>
-      gl.getUniformLocation(prog, name);
+    const uniform = (name: string) =>
+      gl.getUniformLocation(program, name);
 
-    const uTime = u('iTime');
-    const uIter = u('iterations');
-    const uRotZoom = u('rotZoom');
-    const uDistStep = u('distStep');
-    const uColor = u('color');
+    const uTime = uniform('iTime');
+    const uIterations = uniform('iterations');
+    const uRotZoom = uniform('rotZoom');
+    const uDistStep = uniform('distStep');
+    const uColor = uniform('color');
 
-    gl.uniform1f(
-      uRotZoom,
-      ROT_ZOOM
-    );
+    gl.uniform1f(uRotZoom, ROT_ZOOM);
+    gl.uniform1f(uDistStep, DIST_STEP);
+    gl.uniform3fv(uColor, color);
 
-    gl.uniform1f(
-      uDistStep,
-      DIST_STEP
-    );
-
-    gl.uniform3fv(
-      uColor,
-      color
-    );
-
-    gl.viewport(
-      0,
-      0,
-      RES_W,
-      RES_H
-    );
+    gl.viewport(0, 0, RES_W, RES_H);
 
     function fit() {
-      const s = Math.max(
+      const scale = Math.max(
         window.innerWidth / RES_W,
         window.innerHeight / RES_H
       );
 
-      canvas.style.width =
-        `${RES_W * s}px`;
-
-      canvas.style.height =
-        `${RES_H * s}px`;
+      canvas.style.width = `${RES_W * scale}px`;
+      canvas.style.height = `${RES_H * scale}px`;
     }
 
-    window.addEventListener(
-      'resize',
-      fit
-    );
-
+    window.addEventListener('resize', fit);
     fit();
 
     let time = Math.random() * 100;
@@ -271,15 +226,8 @@ void main() {
     let raf = 0;
 
     function draw() {
-      gl.uniform1f(
-        uTime,
-        time
-      );
-
-      gl.uniform1f(
-        uIter,
-        iterations
-      );
+      gl.uniform1f(uTime, time);
+      gl.uniform1f(uIterations, iterations);
 
       gl.drawArrays(
         gl.TRIANGLE_STRIP,
@@ -325,9 +273,7 @@ void main() {
         fpsStamp = now;
       }
 
-      raf = requestAnimationFrame(
-        frame
-      );
+      raf = requestAnimationFrame(frame);
     }
 
     function start() {
@@ -337,9 +283,7 @@ void main() {
       fpsStamp = last;
       frames = 0;
 
-      raf = requestAnimationFrame(
-        frame
-      );
+      raf = requestAnimationFrame(frame);
     }
 
     function stop() {
@@ -349,10 +293,9 @@ void main() {
       }
     }
 
-    const reduceQuery =
-      window.matchMedia(
-        '(prefers-reduced-motion: reduce)'
-      );
+    const reduceQuery = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    );
 
     function applyMotionPref() {
       if (reduceQuery.matches) {
@@ -383,9 +326,7 @@ void main() {
 
     draw();
 
-    canvas.classList.add(
-      'loaded'
-    );
+    canvas.classList.add('loaded');
 
     applyMotionPref();
 
@@ -407,10 +348,10 @@ void main() {
         onVisibilityChange
       );
 
-      gl.deleteBuffer(buf);
-      gl.deleteProgram(prog);
-      gl.deleteShader(vs);
-      gl.deleteShader(fs);
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vertexShader);
+      gl.deleteShader(fragmentShader);
     };
   }, [color, speedMultiplier]);
 
@@ -427,3 +368,4 @@ void main() {
     </div>
   );
 }
+```
