@@ -114,8 +114,8 @@ export default function Home() {
                 <div className="flex items-start gap-3">
                   <span className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/50 p-1.5 shadow-inner transition-transform duration-300 group-hover:scale-105">
                     <img
-                      src="https://Wavydevelopment.xyz/Zion.png"
-                      alt="Wavydevelopment.xyz"
+                      src="https://discord.gg/velocitybot"
+                      alt="velocitybot"
                       className="h-full w-full rounded-md object-contain"
                       loading="lazy"
                       referrerPolicy="no-referrer"
@@ -198,7 +198,7 @@ export default function Home() {
           >
             &copy; {new Date().getFullYear()} Zion &middot;{" "}
             <a
-              href="https://github.com/batman76221"
+              href="https://github.com/zionexe"
               target="_blank"
               rel="noreferrer"
               className="text-zinc-400 hover:text-pink-300 transition-colors"
