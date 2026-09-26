@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <>
-      <ShaderBackground color={[1.0, 0.38, 0.72]} speedMultiplier={1.0} />
+     <ShaderBackground color={[0.72, 0.72, 0.76]} speedMultiplier={1.0} />
 
       <main className="relative z-10 w-full">
         <section className="relative flex min-h-[100svh] w-full items-center justify-center px-4 py-16 sm:px-6">
