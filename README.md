@@ -29,8 +29,8 @@ The homepage contains a central personal profile section for:
 
 The current project cards include:
 
--   **Purify** --- Discord moderation bot
--   **Wavydevelopment.xyz** --- development team
+-   **Valtrix** --- Discord moderation bot/Ticket Bot
+-   **https://discord.gg/velocityshop** --- Velocity Shop
 
 Project cards are responsive and display side-by-side on larger screens
 while stacking on smaller screens.
