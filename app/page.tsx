@@ -65,7 +65,7 @@ export default function Home() {
                   <span className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/50 p-1.5 shadow-inner transition-transform duration-300 group-hover:scale-105">
                     <img
                       src="https://avatars.githubusercontent.com/u/242625464?s=400&u=c61a1097bed4030b512c0e3ef649ffe3b2a0a689&v=4"
-                      alt="Purify"
+                      alt="Valtrix"
                       className="h-full w-full rounded-md object-contain"
                       loading="lazy"
                       referrerPolicy="no-referrer"
@@ -76,7 +76,7 @@ export default function Home() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-zinc-100 transition-colors group-hover:text-white">
-                          Purify
+                          Valtrix
                         </p>
                         <p className="mt-0.5 text-[10px] text-zinc-500">
                           Aug 2026 - present
