@@ -49,7 +49,7 @@ export default function GithubReadme() {
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
         <div className="shrink-0">
           <img
-            src="https://wavydevelopment.xyz/Zion.png"
+            src="https://avatars.githubusercontent.com/u/295158483?v=4"
             alt="Zion avatar"
             className="w-44 h-44 object-cover rounded-md border border-[#30363d] shadow-md"
             loading="lazy"
