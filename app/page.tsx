@@ -151,7 +151,7 @@ export default function Home() {
                 </div>
 
                 <p className="mt-4 text-xs leading-relaxed text-zinc-500">
-                  View my development team.
+                 Fivem Leaks Shop.
                 </p>
               </a>
             </section>
