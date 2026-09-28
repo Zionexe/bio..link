@@ -101,7 +101,7 @@ export default function Home() {
                 </div>
 
                 <p className="mt-4 text-xs leading-relaxed text-zinc-500">
-                  The all-in-one Discord moderation/ticket bot for your server.
+                 Valtrix — Premium moderation, security, and ticket management.One bot. Total control.
                 </p>
               </a>
 
@@ -151,7 +151,9 @@ export default function Home() {
                 </div>
 
                 <p className="mt-4 text-xs leading-relaxed text-zinc-500">
-                 Fivem Leaks Shop.
+            Premium FiveM assets, vehicles, clothing, scripts, and server-ready resources — built to elevate your server.
+
+Quality. Performance. Velocity.
                 </p>
               </a>
             </section>
