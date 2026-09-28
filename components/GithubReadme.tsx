@@ -7,9 +7,9 @@ export default function GithubReadme() {
   return (
     <div className="w-full rounded-xl border border-[#30363d] bg-[#0d1117] text-[#e6edf3] p-5 sm:p-7 shadow-2xl font-sans text-left space-y-4 select-text">
       <div className="flex items-center justify-between text-xs text-[#7d8590]">
-        <span className="font-mono text-[11px] text-[#8b949e]">Batman76221 / README.md</span>
+        <span className="font-mono text-[11px] text-[#8b949e]">zionexe / README.md</span>
         <a
-          href="https://github.com/Batman76221/Batman76221/edit/main/README.md"
+          href="https://github.com/zionexe/zionexe/edit/main/README.md"
           target="_blank"
           rel="noreferrer"
           className="text-[#7d8590] hover:text-[#58a6ff] transition-colors"
@@ -159,7 +159,7 @@ Hobbies  : [
               </a>
               {" "}&amp;{" "}
               <a
-                href="https://github.com/Batman76221"
+                href="https://github.com/zionexe"
                 target="_blank"
                 rel="noreferrer"
                 className="text-[#58a6ff] hover:underline"
