@@ -43,7 +43,7 @@ export default function Home() {
                       href={item.href}
                       aria-label={item.label}
                       {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-                      className="group relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-zinc-400 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-pink-500/40 hover:bg-pink-500/10 hover:text-pink-300 hover:shadow-[0_0_20px_rgba(244,114,182,0.3)]"
+                      className="group relative flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-zinc-400 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-white/40 hover:bg-black/40 hover:text-white hover:shadow-[0_0_20px_rgba(255,255,255,0.16)]"
                     >
                       <Icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" aria-hidden="true" />
                     </a>
@@ -56,7 +56,7 @@ export default function Home() {
 
             <section className="fade-in-up delay-2 grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
               <a
-                href="https://discord.gg/valtrix"
+                href="https://exhale.best"
                 target="_blank"
                 rel="noreferrer"
                 className="group relative flex min-h-[160px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-black/40 hover:shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
