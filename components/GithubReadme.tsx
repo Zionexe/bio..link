@@ -30,7 +30,7 @@ export default function GithubReadme() {
       </p>
 
       <blockquote className="border-l-2 border-white/60 pl-3.5 py-0.5 text-[#8b949e] text-xs sm:text-sm leading-relaxed">
-        I&apos;m 16 a discord bot developer, malware analyst and neverlose csgo lua creator. One of my biggest projects is a discord bot called PurifyBot with tons of features. <span className="text-[#f85149]">❤️</span>
+        I&apos;m 15 a discord bot developer, CyberSecurity Anaylst. My favorite scripting languages are JavaScript, C#, CSS, HTML, Rust, Python. One of my biggest projects is a discord bot called Valtrix with tons of features. <span className="text-[#f85149]">❤️</span>
       </blockquote>
 
       <div className="flex items-center justify-between rounded-md border border-[#30363d] bg-[#161b22] px-3.5 py-2 text-xs font-mono">
