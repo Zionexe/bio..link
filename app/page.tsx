@@ -109,7 +109,7 @@ export default function Home() {
                 href="https://Wavydevelopment.xyz"
                 target="_blank"
                 rel="noreferrer"
-                className="group relative flex min-h-[160px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-pink-500/30 hover:bg-white/[0.03] hover:shadow-[0_8px_30px_rgba(244,114,182,0.10)]"
+                className="group relative flex min-h-[160px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-black/20 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-black/40 hover:shadow-[0_8px_30px_rgba(0,0,0,0.35)]"
               >
                 <div className="flex items-start gap-3">
                   <span className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/50 p-1.5 shadow-inner transition-transform duration-300 group-hover:scale-105">
@@ -125,7 +125,7 @@ export default function Home() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-zinc-100 transition-colors group-hover:text-pink-200">
+                        <p className="truncate text-sm font-semibold text-zinc-100 transition-colors group-hover:text-white">
                           Wavydevelopment.xyz
                         </p>
                         <p className="mt-0.5 text-[10px] text-zinc-500">
@@ -140,7 +140,7 @@ export default function Home() {
                         viewBox="0 0 24 24"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="mt-0.5 h-4 w-4 flex-shrink-0 text-zinc-600 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-pink-300"
+                        className="mt-0.5 h-4 w-4 flex-shrink-0 text-zinc-600 transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-zinc-300"
                         aria-hidden="true"
                       >
                         <line x1="7" y1="17" x2="17" y2="7"></line>
