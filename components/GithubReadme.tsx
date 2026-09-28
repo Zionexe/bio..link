@@ -144,13 +144,13 @@ Hobbies  : [
         <ul className="text-xs sm:text-sm text-[#e6edf3] space-y-1 list-none pl-1">
           <li className="flex items-center gap-2">
             <span className="text-[#7d8590]">•</span>
-            <span>Discord: <span className="text-[#79c0ff]">fbihauntsme</span></span>
+            <span>Discord: <span className="text-[#79c0ff]">therealziontech</span></span>
           </li>
           <li className="flex items-center gap-2">
             <span className="text-[#7d8590]">•</span>
             <span>
               <a
-                href="https://fakecrime.bio/Zion"
+                href="https://fakecrime.bio/zionexe"
                 target="_blank"
                 rel="noreferrer"
                 className="text-[#58a6ff] hover:underline"
