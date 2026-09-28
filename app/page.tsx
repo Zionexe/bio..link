@@ -64,7 +64,7 @@ export default function Home() {
                 <div className="flex items-start gap-3">
                   <span className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/50 p-1.5 shadow-inner transition-transform duration-300 group-hover:scale-105">
                     <img
-                      src="https://avatars.githubusercontent.com/u/242625464?s=400&u=c61a1097bed4030b512c0e3ef649ffe3b2a0a689&v=4"
+                      src="https://cdn.discordapp.com/icons/1520993708135284868/aaed959c3f7c4e4e949e951f04353487.webp?size=1024"
                       alt="Valtrix"
                       className="h-full w-full rounded-md object-contain"
                       loading="lazy"
