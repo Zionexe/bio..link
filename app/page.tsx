@@ -126,7 +126,7 @@ export default function Home() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-zinc-100 transition-colors group-hover:text-white">
-                          discord.gg/VelocityShop 
+                        VelocityShop 
                         </p>
                         <p className="mt-0.5 text-[10px] text-zinc-500">
                           Sep 2026 - present
