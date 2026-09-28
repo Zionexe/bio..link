@@ -114,8 +114,8 @@ export default function Home() {
                 <div className="flex items-start gap-3">
                   <span className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/50 p-1.5 shadow-inner transition-transform duration-300 group-hover:scale-105">
                     <img
-                      src="https://discord.gg/velocitybot"
-                      alt="velocitybot"
+                      src="https://cdn.discordapp.com/icons/972563890934251580/fb620d172a1ec8b92db2a73c9f12b91c.webp?size=1024"
+                      alt="Velocity Shop"
                       className="h-full w-full rounded-md object-contain"
                       loading="lazy"
                       referrerPolicy="no-referrer"
@@ -126,7 +126,7 @@ export default function Home() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-zinc-100 transition-colors group-hover:text-white">
-                        VelocityShop 
+                          discord.gg/VelocityShop 
                         </p>
                         <p className="mt-0.5 text-[10px] text-zinc-500">
                           Sep 2026 - present
