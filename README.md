@@ -431,18 +431,18 @@ Description:
 The all-in-one Discord moderation bot for your server.
 ```
 
-## Wavydevelopment.xyz
+## https://discord.gg/Valtrix
 
 Website:
 
 ``` text
-https://Wavydevelopment.xyz
+https://discord.gg/Valtrix
 ```
 
 Logo:
 
 ``` text
-https://Wavydevelopment.xyz/Zion.png
+https://cdn.discordapp.com/icons/1520993708135284868/2a96f15c0b8657da12f0cdb24bd2c002.webp?size=1024
 ```
 
 Description:
