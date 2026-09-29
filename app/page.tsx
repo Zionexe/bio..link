@@ -24,10 +24,7 @@ export default function Home() {
 
   return (
     <>
-      <ShaderBackground
-        color={[1.0, 1.0, 1.0]}
-        speedMultiplier={1.0}
-      />
+<div className="fixed inset-0 z-0 bg-black" />
 
       <main className="relative z-10 w-full">
         <section className="relative flex min-h-[100svh] w-full items-center justify-center px-4 py-16 sm:px-6">
