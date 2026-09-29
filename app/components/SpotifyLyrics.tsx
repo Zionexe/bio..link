@@ -15,20 +15,29 @@ function parseLrc(lrc: string): LyricLine[] {
   for (const line of lrc.split("\n")) {
     const match = line.match(/^\[(\d+):(\d+)\.(\d+)\]\s*(.*)/);
 
-    if (!match) continue;
+    if (!match) {
+      continue;
+    }
 
-    const minutes = parseInt(match[1], 10);
-    const seconds = parseInt(match[2], 10);
-    const ms = parseInt(
+    const minutes = Number.parseInt(match[1], 10);
+    const seconds = Number.parseInt(match[2], 10);
+    const milliseconds = Number.parseInt(
       match[3].padEnd(3, "0").slice(0, 3),
       10
     );
 
-    const time = minutes * 60000 + seconds * 1000 + ms;
+    const time =
+      minutes * 60000 +
+      seconds * 1000 +
+      milliseconds;
+
     const text = match[4].trim();
 
-    if (text) {
-      lines.push({ time, text });
+    if (text.length > 0) {
+      lines.push({
+        time,
+        text,
+      });
     }
   }
 
@@ -52,54 +61,66 @@ export default function SpotifyLyrics({
   track = "I'm tired of this",
   artist = "Rebzyyx; Rezlaine",
   albumArt = "https://i.scdn.co/image/ab67616d0000b273533d022da9781fbe94f2cd08",
-  timestamps,
+  timestamps = null,
   isPlaying = true,
 }: Props) {
   const activeTrack = track || "I'm tired of this";
   const activeArtist = artist || "Rebzyyx; Rezlaine";
 
-  const [lines, setLines] = useState<LyricLine[] | null>(null);
+  const [lines, setLines] = useState<LyricLine[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [isUserInteracting, setIsUserInteracting] = useState(false);
+  const [isUserInteracting, setIsUserInteracting] =
+    useState(false);
 
   const lastTrackRef = useRef<string | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const activeLineRef = useRef<HTMLDivElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const intervalRef =
+    useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const scrollTimeoutRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const activeLineRef =
+    useRef<HTMLDivElement | null>(null);
+
+  const containerRef =
+    useRef<HTMLDivElement | null>(null);
 
   const fetchLyrics = useCallback(
     async (
       id: string | null | undefined,
-      t: string,
-      a: string
+      title: string,
+      performer: string
     ) => {
       try {
-        const params = new URLSearchParams({
-          track: t,
-          artist: a,
-        });
+        const params = new URLSearchParams();
+
+        params.set("track", title);
+        params.set("artist", performer);
 
         if (id) {
           params.set("trackId", id);
         }
 
-        const res = await fetch(
-          `/api/lyrics?${params.toString()}`,
+        const response = await fetch(
+          "/api/lyrics?" + params.toString(),
           {
             cache: "no-store",
           }
         );
 
-        if (!res.ok) return;
+        if (!response.ok) {
+          return;
+        }
 
-        const data = await res.json();
+        const data = await response.json();
 
-        if (data.syncedLyrics) {
+        if (data && data.syncedLyrics) {
           setLines(parseLrc(data.syncedLyrics));
+          setCurrentIdx(0);
         }
       } catch {
-        // Ignore lyric fetch errors
+        setLines([]);
       }
     },
     []
@@ -107,7 +128,7 @@ export default function SpotifyLyrics({
 
   useEffect(() => {
     const trackKey =
-      trackId ?? `${activeTrack}::${activeArtist}`;
+      trackId || activeTrack + "::" + activeArtist;
 
     if (lastTrackRef.current === trackKey) {
       return;
@@ -115,7 +136,11 @@ export default function SpotifyLyrics({
 
     lastTrackRef.current = trackKey;
 
-    fetchLyrics(trackId, activeTrack, activeArtist);
+    fetchLyrics(
+      trackId,
+      activeTrack,
+      activeArtist
+    );
   }, [
     trackId,
     activeTrack,
@@ -126,9 +151,10 @@ export default function SpotifyLyrics({
   useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
 
-    if (!lines || lines.length === 0) {
+    if (lines.length === 0) {
       return;
     }
 
@@ -136,8 +162,9 @@ export default function SpotifyLyrics({
       return;
     }
 
-    const sync = () => {
-      const elapsed = Date.now() - timestamps.start;
+    const syncLyrics = () => {
+      const elapsed =
+        Date.now() - timestamps.start;
 
       if (elapsed < 0) {
         setCurrentIdx(0);
@@ -146,40 +173,49 @@ export default function SpotifyLyrics({
 
       let low = 0;
       let high = lines.length - 1;
-      let idx = 0;
+      let index = 0;
 
       while (low <= high) {
-        const mid = (low + high) >> 1;
+        const middle = Math.floor(
+          (low + high) / 2
+        );
 
-        if (lines[mid].time <= elapsed) {
-          idx = mid;
-          low = mid + 1;
+        if (lines[middle].time <= elapsed) {
+          index = middle;
+          low = middle + 1;
         } else {
-          high = mid - 1;
+          high = middle - 1;
         }
       }
 
-      setCurrentIdx(idx);
+      setCurrentIdx(index);
     };
 
-    sync();
+    syncLyrics();
 
-    intervalRef.current = setInterval(sync, 60);
+    intervalRef.current = setInterval(
+      syncLyrics,
+      60
+    );
 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [lines, timestamps, isPlaying]);
+  }, [
+    lines,
+    timestamps,
+    isPlaying,
+  ]);
 
   useEffect(() => {
-    if (
-      isUserInteracting ||
-      currentIdx < 0 ||
-      !activeLineRef.current ||
-      !containerRef.current
-    ) {
+    if (isUserInteracting) {
+      return;
+    }
+
+    if (!activeLineRef.current) {
       return;
     }
 
@@ -187,21 +223,43 @@ export default function SpotifyLyrics({
       behavior: "smooth",
       block: "center",
     });
-  }, [currentIdx, isUserInteracting]);
+  }, [
+    currentIdx,
+    isUserInteracting,
+  ]);
 
-  const handleContainerScroll = () => {
+  const handleScroll = () => {
     setIsUserInteracting(true);
 
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
 
-    scrollTimeoutRef.current = setTimeout(() => {
-      setIsUserInteracting(false);
-    }, 4000);
+    scrollTimeoutRef.current = setTimeout(
+      () => {
+        setIsUserInteracting(false);
+      },
+      4000
+    );
   };
 
-  if (!lines || lines.length === 0) {
+  const handleLineClick = (index: number) => {
+    setCurrentIdx(index);
+    setIsUserInteracting(true);
+
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    scrollTimeoutRef.current = setTimeout(
+      () => {
+        setIsUserInteracting(false);
+      },
+      4000
+    );
+  };
+
+  if (lines.length === 0) {
     return null;
   }
 
@@ -209,13 +267,13 @@ export default function SpotifyLyrics({
     <section className="fade-in-up delay-2 w-full glass-card overflow-hidden p-5 border border-white/10 hover:border-white/20 transition-all shadow-xl">
       <div className="flex items-center justify-between pb-3.5 border-b border-white/10 mb-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          {albumArt && (
+          {albumArt ? (
             <img
               src={albumArt}
               alt=""
               className="h-8 w-8 rounded-md object-cover border border-white/10 shadow-sm"
             />
-          )}
+          ) : null}
 
           <div className="min-w-0">
             <p className="text-xs font-semibold text-zinc-100 truncate">
@@ -240,33 +298,29 @@ export default function SpotifyLyrics({
 
       <div
         ref={containerRef}
-        onScroll={handleContainerScroll}
+        onScroll={handleScroll}
         className="relative max-h-72 sm:max-h-80 w-full overflow-y-auto pr-1 space-y-2 select-none scroll-smooth"
       >
-        {lines.map((line, idx) => {
-          const isCurrent = idx === currentIdx;
+        {lines.map((line, index) => {
+          const isCurrent =
+            index === currentIdx;
+
+          const lineClassName = isCurrent
+            ? "transition-all duration-300 rounded-xl px-4 py-2 text-center text-xs sm:text-sm cursor-pointer font-extrabold text-white bg-white/10 border border-white/30 scale-[1.02] drop-shadow-[0_0_16px_rgba(255,255,255,0.5)] shadow-[0_0_20px_rgba(255,255,255,0.15)]"
+            : "transition-all duration-300 rounded-xl px-4 py-2 text-center text-xs sm:text-sm cursor-pointer font-normal text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]";
 
           return (
             <div
-              key={`${line.time}-${idx}`}
-              ref={isCurrent ? activeLineRef : null}
-              onClick={() => {
-                setCurrentIdx(idx);
-                setIsUserInteracting(true);
-
-                if (scrollTimeoutRef.current) {
-                  clearTimeout(scrollTimeoutRef.current);
-                }
-
-                scrollTimeoutRef.current = setTimeout(() => {
-                  setIsUserInteracting(false);
-                }, 4000);
-              }}
-              className={
+              key={line.time + "-" + index}
+              ref={
                 isCurrent
-                  ? "transition-all duration-300 rounded-xl px-4 py-2 text-center text-xs sm:text-sm cursor-pointer font-extrabold text-white bg-white/10 border border-white/30 scale-[1.02] drop-shadow-[0_0_16px_rgba(255,255,255,0.5)] shadow-[0_0_20px_rgba(255,255,255,0.15)]"
-                  : "transition-all duration-300 rounded-xl px-4 py-2 text-center text-xs sm:text-sm cursor-pointer font-normal text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
+                  ? activeLineRef
+                  : null
               }
+              onClick={() =>
+                handleLineClick(index)
+              }
+              className={lineClassName}
             >
               {line.text}
             </div>
@@ -276,8 +330,3 @@ export default function SpotifyLyrics({
     </section>
   );
 }
-```
-
-This version avoids the nested template literal entirely, so the **TS1443** and **TS1160** errors should be gone.
-
-It also contains **no `pink-*` classes or pink `rgba(244,114,182,...)` values**.
