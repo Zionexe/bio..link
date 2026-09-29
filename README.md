@@ -29,7 +29,7 @@ The homepage contains a central personal profile section for:
 
 The current project cards include:
 
--   **Valtrix** --- Discord moderation bot/Ticket Bot
+-   **https://discord.gg/Valtrix** --- Discord moderation bot/Ticket Bot
 -   **https://discord.gg/velocityshop** --- Velocity Shop
 
 Project cards are responsive and display side-by-side on larger screens
