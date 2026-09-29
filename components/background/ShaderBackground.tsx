@@ -8,7 +8,7 @@ interface ShaderBackgroundProps {
 }
 
 export default function ShaderBackground({
-  color = [1.0, 0.38, 0.72],
+  color = [1.0, 1.0, 1.0],
   speedMultiplier = 1.0,
 }: ShaderBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
