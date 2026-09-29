@@ -24,11 +24,18 @@ function parseLrc(lrc: string): LyricLine[] {
       10
     );
 
-    const time = minutes * 60000 + seconds * 1000 + ms;
+    const time =
+      minutes * 60000 +
+      seconds * 1000 +
+      ms;
+
     const text = match[4].trim();
 
     if (text) {
-      lines.push({ time, text });
+      lines.push({
+        time,
+        text,
+      });
     }
   }
 
@@ -60,13 +67,22 @@ export default function SpotifyLyrics({
 
   const [lines, setLines] = useState<LyricLine[] | null>(null);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [isUserInteracting, setIsUserInteracting] = useState(false);
+  const [isUserInteracting, setIsUserInteracting] =
+    useState(false);
 
   const lastTrackRef = useRef<string | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const activeLineRef = useRef<HTMLDivElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const intervalRef =
+    useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const scrollTimeoutRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const activeLineRef =
+    useRef<HTMLDivElement | null>(null);
+
+  const containerRef =
+    useRef<HTMLDivElement | null>(null);
 
   const fetchLyrics = useCallback(
     async (
@@ -115,7 +131,11 @@ export default function SpotifyLyrics({
 
     lastTrackRef.current = trackKey;
 
-    fetchLyrics(trackId, activeTrack, activeArtist);
+    fetchLyrics(
+      trackId,
+      activeTrack,
+      activeArtist
+    );
   }, [
     trackId,
     activeTrack,
@@ -137,7 +157,8 @@ export default function SpotifyLyrics({
     }
 
     const sync = () => {
-      const elapsed = Date.now() - timestamps.start;
+      const elapsed =
+        Date.now() - timestamps.start;
 
       if (elapsed < 0) {
         setCurrentIdx(0);
@@ -164,14 +185,21 @@ export default function SpotifyLyrics({
 
     sync();
 
-    intervalRef.current = setInterval(sync, 60);
+    intervalRef.current = setInterval(
+      sync,
+      60
+    );
 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [lines, timestamps, isPlaying]);
+  }, [
+    lines,
+    timestamps,
+    isPlaying,
+  ]);
 
   useEffect(() => {
     if (
@@ -187,18 +215,24 @@ export default function SpotifyLyrics({
       behavior: "smooth",
       block: "center",
     });
-  }, [currentIdx, isUserInteracting]);
+  }, [
+    currentIdx,
+    isUserInteracting,
+  ]);
 
   const handleContainerScroll = () => {
     setIsUserInteracting(true);
 
     if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
+      clearTimeout(
+        scrollTimeoutRef.current
+      );
     }
 
-    scrollTimeoutRef.current = setTimeout(() => {
-      setIsUserInteracting(false);
-    }, 4000);
+    scrollTimeoutRef.current =
+      setTimeout(() => {
+        setIsUserInteracting(false);
+      }, 4000);
   };
 
   if (!lines || lines.length === 0) {
@@ -206,14 +240,48 @@ export default function SpotifyLyrics({
   }
 
   return (
-    <section className="fade-in-up delay-2 w-full glass-card overflow-hidden p-5 border border-white/10 hover:border-white/20 transition-all shadow-xl">
-      <div className="flex items-center justify-between pb-3.5 border-b border-white/10 mb-3">
+    <section
+      className="
+        fade-in-up
+        delay-2
+        w-full
+        glass-card
+        overflow-hidden
+        p-5
+        border
+        border-white/10
+        hover:border-white/20
+        transition-all
+        shadow-xl
+      "
+    >
+      {/* Header */}
+      <div
+        className="
+          flex
+          items-center
+          justify-between
+          pb-3.5
+          border-b
+          border-white/10
+          mb-3
+        "
+      >
+        {/* Track Information */}
         <div className="flex items-center gap-2.5 min-w-0">
           {albumArt && (
             <img
               src={albumArt}
               alt=""
-              className="h-8 w-8 rounded-md object-cover border border-white/10 shadow-sm"
+              className="
+                h-8
+                w-8
+                rounded-md
+                object-cover
+                border
+                border-white/10
+                shadow-sm
+              "
             />
           )}
 
@@ -228,7 +296,24 @@ export default function SpotifyLyrics({
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-white/20 bg-white/5 text-white text-[11px] font-medium shadow-[0_0_12px_rgba(255,255,255,0.15)]">
+        {/* Full Lyrics Badge */}
+        <div
+          className="
+            flex
+            items-center
+            gap-1.5
+            px-2.5
+            py-1
+            rounded-full
+            border
+            border-white/20
+            bg-white/5
+            text-white
+            text-[11px]
+            font-medium
+            shadow-[0_0_12px_rgba(255,255,255,0.15)]
+          "
+        >
           <FiMusic
             className="animate-pulse text-white"
             size={12}
@@ -238,35 +323,84 @@ export default function SpotifyLyrics({
         </div>
       </div>
 
+      {/* Lyrics */}
       <div
         ref={containerRef}
         onScroll={handleContainerScroll}
-        className="relative max-h-72 sm:max-h-80 w-full overflow-y-auto pr-1 space-y-2 select-none scroll-smooth"
+        className="
+          relative
+          max-h-72
+          sm:max-h-80
+          w-full
+          overflow-y-auto
+          pr-1
+          space-y-2
+          select-none
+          scroll-smooth
+        "
       >
         {lines.map((line, idx) => {
-          const isCurrent = idx === currentIdx;
+          const isCurrent =
+            idx === currentIdx;
 
           return (
             <div
               key={`${line.time}-${idx}`}
-              ref={isCurrent ? activeLineRef : null}
+              ref={
+                isCurrent
+                  ? activeLineRef
+                  : null
+              }
               onClick={() => {
                 setCurrentIdx(idx);
                 setIsUserInteracting(true);
 
-                if (scrollTimeoutRef.current) {
-                  clearTimeout(scrollTimeoutRef.current);
+                if (
+                  scrollTimeoutRef.current
+                ) {
+                  clearTimeout(
+                    scrollTimeoutRef.current
+                  );
                 }
 
-                scrollTimeoutRef.current = setTimeout(() => {
-                  setIsUserInteracting(false);
-                }, 4000);
+                scrollTimeoutRef.current =
+                  setTimeout(() => {
+                    setIsUserInteracting(
+                      false
+                    );
+                  }, 4000);
               }}
-              className={
-                isCurrent
-                  ? "transition-all duration-300 rounded-xl px-4 py-2 text-center text-xs sm:text-sm cursor-pointer font-extrabold text-white bg-white/10 border border-white/30 scale-[1.02] drop-shadow-[0_0_16px_rgba(255,255,255,0.5)] shadow-[0_0_20px_rgba(255,255,255,0.15)]"
-                  : "transition-all duration-300 rounded-xl px-4 py-2 text-center text-xs sm:text-sm cursor-pointer font-normal text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
-              }
+              className={`
+                transition-all
+                duration-300
+                rounded-xl
+                px-4
+                py-2
+                text-center
+                text-xs
+                sm:text-sm
+                cursor-pointer
+
+                ${
+                  isCurrent
+                    ? `
+                      font-extrabold
+                      text-white
+                      bg-white/10
+                      border
+                      border-white/30
+                      scale-[1.02]
+                      drop-shadow-[0_0_16px_rgba(255,255,255,0.5)]
+                      shadow-[0_0_20px_rgba(255,255,255,0.15)]
+                    `
+                    : `
+                      font-normal
+                      text-zinc-500
+                      hover:text-zinc-300
+                      hover:bg-white/[0.03]
+                    `
+                }
+              `}
             >
               {line.text}
             </div>
