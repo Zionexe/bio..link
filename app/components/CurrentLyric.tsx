@@ -118,8 +118,8 @@ export default function CurrentLyric({ spotify, isLive, timestamps }: CurrentLyr
   if (!currentLyric) return null;
 
   return (
-    <div className="fade-in-up delay-1 w-full px-4 text-center" aria-live="polite">
-      <p className="text-sm sm:text-base font-semibold text-pink-300 drop-shadow-[0_0_12px_rgba(244,114,182,0.35)]">
+<div className="fade-in-up delay-1 w-full px-4 text-center" aria-live="polite">
+  <p className="text-sm sm:text-base font-semibold text-black">
         {currentLyric}
       </p>
     </div>
