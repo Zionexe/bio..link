@@ -9,7 +9,7 @@ export interface Link {
 }
 
 export const links: Link[] = [
-  { label: "github", href: "https://github.com/batman76221", icon: SiGithub },
-  { label: "discord", href: "https://discord.com/users/1447292903654428733", icon: SiDiscord },
-  { label: "source", href: "https://github.com/batman76221/PersonalBiolink", icon: FiCode },
+  { label: "github", href: "https://github.com/zionexe", icon: SiGithub },
+  { label: "discord", href: "https://discord.com/users/855589141064318977", icon: SiDiscord },
+  { label: "source", href: "https://github.com/Zionexe/bio..link", icon: FiCode },
 ];
