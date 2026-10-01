@@ -50,7 +50,7 @@ export default function PresenceWithLyrics() {
       />
       <section className="fade-in-up delay-1 w-full mt-3">
         <LanyardStatus
-          userId="1447292903654428733"
+          userId="855589141064318977"
           onSpotifyChange={handleSpotifyChange}
         />
       </section>
