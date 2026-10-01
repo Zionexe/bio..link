@@ -23,10 +23,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Terrified",
+  title: "Zion",
   description: "passionate developer creating products.",
   icons: {
-    icon: "https://wavydevelopment.xyz/terrified.png",
+    icon: "https://wavydevelopment.xyz/Zion.png",
   },
 };
 
