@@ -188,7 +188,7 @@ export default function DynamicIsland({ tracks, cover = "/Track.png", apiRef, on
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.volume = 0.03;
+    audio.volume = 0.40;
   }, []);
 
   useEffect(() => {
