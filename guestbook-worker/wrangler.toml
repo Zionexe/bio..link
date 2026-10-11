@@ -1,0 +1,12 @@
+name = "zion-guestbook"
+main = "worker.js"
+compatibility_date = "2024-09-01"
+
+# Step 3 of README.md: paste the id that `wrangler kv namespace create GUESTBOOK` prints.
+[[kv_namespaces]]
+binding = "GUESTBOOK"
+id = "PASTE_YOUR_KV_ID_HERE"
+
+[vars]
+# Sites allowed to post. Add your real domain; localhost is for `npm run dev`.
+ALLOWED_ORIGINS = "https://ltut.lol,http://localhost:5173"

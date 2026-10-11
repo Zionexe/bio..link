@@ -1,0 +1,363 @@
+/* ── LyricsCard ──────────────────────────────────────────────────────────── */
+/* Liquid-glass surface (rim light + pointer specular come from .liquid-glass
+   in App.css) over a living, blurred copy of the album art. Every piece
+   settles in on its own beat when the card appears. */
+
+:root {
+  --lyc-line-h: 30px;
+}
+
+.lyc-card {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 18px 12px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  animation: lyc-card-in 0.6s var(--ease-out) both;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lyc-card:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+@keyframes lyc-card-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Living artwork backdrop --------------------------------------------------- */
+
+.lyc-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  animation: lyc-bg-in 1.2s var(--ease-out) both;
+}
+
+@keyframes lyc-bg-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Dark wash keeps the glowing text legible over any cover. */
+.lyc-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.55) 70%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.5));
+}
+
+.lyc-bg-layer {
+  position: absolute;
+  inset: -40%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(32px) saturate(1.7) brightness(0.55);
+  will-change: transform;
+}
+
+/* Two copies drifting against each other — slow enough to read as ambient
+   light, never as movement you track. */
+.lyc-bg-a {
+  animation: lyc-drift-a 28s ease-in-out infinite alternate;
+}
+
+.lyc-bg-b {
+  opacity: 0.6;
+  mix-blend-mode: screen;
+  animation: lyc-drift-b 34s ease-in-out infinite alternate;
+}
+
+@keyframes lyc-drift-a {
+  from { transform: rotate(0deg) scale(1); }
+  to   { transform: rotate(24deg) scale(1.15) translate(4%, -3%); }
+}
+
+@keyframes lyc-drift-b {
+  from { transform: rotate(180deg) scale(1.2) translate(6%, 4%); }
+  to   { transform: rotate(150deg) scale(1) translate(-4%, -2%); }
+}
+
+/* Header: art thumbnail + song/artist + live equalizer ---------------------- */
+
+.lyc-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.lyc-art {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 9px;
+  object-fit: cover;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  animation: lyc-art-in 0.7s var(--spring-expand) 0.12s both;
+}
+
+@keyframes lyc-art-in {
+  from { opacity: 0; transform: scale(0.85); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+.lyc-art-placeholder {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.lyc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  animation: lyc-rise 0.6s var(--ease-out) 0.2s both;
+}
+
+@keyframes lyc-rise {
+  from { opacity: 0; transform: translateY(6px); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+.lyc-song {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7), 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.lyc-artist {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Tiny live equalizer — says "this is playing right now". */
+.lyc-eq {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  flex-shrink: 0;
+  animation: lyc-rise 0.6s var(--ease-out) 0.28s both;
+}
+
+.lyc-eq i {
+  width: 2.5px;
+  height: 100%;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
+  transform-origin: 50% 100%;
+  animation: lyc-eq 0.9s ease-in-out infinite alternate;
+}
+
+.lyc-eq i:nth-child(2) { animation-duration: 0.62s; animation-delay: -0.3s; }
+.lyc-eq i:nth-child(3) { animation-duration: 0.78s; animation-delay: -0.55s; }
+
+@keyframes lyc-eq {
+  0%   { transform: scaleY(0.25); }
+  50%  { transform: scaleY(0.9); }
+  100% { transform: scaleY(0.45); }
+}
+
+/* Loading skeleton + status ------------------------------------------------ */
+
+.lyc-skeleton {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 8px 0 6px;
+  animation: lyc-rise 0.5s var(--ease-out) 0.3s both;
+}
+
+.lyc-skeleton span {
+  height: 10px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.16) 50%, rgba(255, 255, 255, 0.06) 100%);
+  background-size: 200% 100%;
+  animation: lyc-shine 1.4s linear infinite;
+}
+
+.lyc-skeleton span:nth-child(1) { width: 72%; }
+.lyc-skeleton span:nth-child(2) { width: 88%; animation-delay: 0.12s; }
+.lyc-skeleton span:nth-child(3) { width: 54%; animation-delay: 0.24s; }
+
+@keyframes lyc-shine {
+  from { background-position: 100% 0; }
+  to   { background-position: -100% 0; }
+}
+
+.lyc-status {
+  position: relative;
+  z-index: 1;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 6px 2px 2px;
+  animation: lyc-rise 0.5s var(--ease-out) both;
+}
+
+/* Scrolling lyric window --------------------------------------------------- */
+
+.lyc-viewport {
+  position: relative;
+  z-index: 1;
+  height: calc(var(--lyc-line-h) * 3);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 28%, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 28%, #000 72%, transparent 100%);
+  animation: lyc-rise 0.7s var(--ease-out) 0.3s both;
+}
+
+/* Each line is positioned on its own (translate set inline) so lines can
+   move with a staggered delay — Apple Music's cascading scroll. All lines
+   share one font size; state changes are pure transforms, so nothing
+   reflows while it moves. Lines further from the current one soften, like
+   Apple Music's depth-of-field. */
+.lyc-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transform-origin: left center;
+  height: var(--lyc-line-h);
+  display: flex;
+  align-items: center;
+  font-size: 15.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.45);
+  transform: scale(0.8);
+  filter: blur(0.6px);
+  transition:
+    translate var(--spring-dur) var(--spring),
+    transform var(--spring-dur) var(--spring),
+    color 0.4s ease,
+    opacity 0.4s ease,
+    filter 0.4s ease,
+    text-shadow 0.4s ease;
+}
+
+.lyc-line.is-current {
+  font-weight: 700;
+  color: #ffffff;
+  opacity: 1;
+  transform: scale(1);
+  filter: none;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 255, 255, 0.4),
+    0 0 22px rgba(255, 255, 255, 0.18);
+}
+
+.lyc-line.is-near {
+  opacity: 0.6;
+  transform: scale(0.82);
+  filter: blur(0.5px);
+}
+
+.lyc-line.is-far {
+  opacity: 0.25;
+  transform: scale(0.78);
+  filter: blur(1.2px);
+}
+
+.lyc-line.is-hidden {
+  opacity: 0;
+  transform: scale(0.76);
+  filter: blur(2px);
+}
+
+/* Progress ------------------------------------------------------------------ */
+
+.lyc-progress {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 2px;
+  animation: lyc-rise 0.6s var(--ease-out) 0.38s both;
+}
+
+.lyc-time {
+  flex-shrink: 0;
+  min-width: 30px;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.lyc-time:last-child {
+  text-align: right;
+}
+
+.lyc-progress-bar {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+  transition: transform var(--spring-dur) var(--spring);
+}
+
+.lyc-progress-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  transition: transform 250ms linear; /* matches the 250ms tick */
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lyc-card:hover .lyc-progress-bar { transform: scaleY(1.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lyc-card,
+  .lyc-art,
+  .lyc-meta,
+  .lyc-eq,
+  .lyc-skeleton,
+  .lyc-status,
+  .lyc-viewport,
+  .lyc-progress { animation: lyc-fade 0.2s ease both; }
+  .lyc-bg-a,
+  .lyc-bg-b,
+  .lyc-eq i,
+  .lyc-skeleton span { animation: none; }
+  .lyc-line { transition: color 0.15s ease, opacity 0.15s ease; transition-delay: 0s !important; transform: none !important; }
+  .lyc-progress-fill { transition: none; }
+  .lyc-card:hover .lyc-progress-bar { transform: none; }
+}
+
+@keyframes lyc-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

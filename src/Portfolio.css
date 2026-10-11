@@ -1,0 +1,250 @@
+/* ── Portfolio page ──────────────────────────────────────────────────────── */
+
+.pf-card {
+  /* Leave room for the Dynamic Island above and the tab bar below; scroll
+     inside the card if a long project list doesn't fit. */
+  max-height: calc(100dvh - 170px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 4px 12px;
+  scrollbar-width: none;
+}
+
+.pf-card::-webkit-scrollbar {
+  display: none;
+}
+
+.pf-card > * + * {
+  margin-top: 24px;
+}
+
+.pf-section {
+  width: 100%;
+}
+
+.pf-heading {
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.pf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Project cards ------------------------------------------------------------- */
+
+.pf-project {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pf-project > * {
+  position: relative;
+  z-index: 4;
+}
+
+.pf-project-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pf-project-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7), 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.pf-project-desc {
+  margin-top: 6px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.pf-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.pf-tag {
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Link rows ----------------------------------------------------------------- */
+
+.pf-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pf-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pf-link > * {
+  position: relative;
+  z-index: 4;
+}
+
+.pf-link-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
+}
+
+.pf-link-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pf-link-label {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pf-link-handle {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pf-arrow {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: rgba(255, 255, 255, 0.45);
+  transition: color 200ms ease, translate 250ms var(--ease-out);
+}
+
+/* Shared hover / press for anything clickable on this page. */
+.pf-clickable {
+  cursor: pointer;
+  transition: translate 250ms var(--ease-out), scale 250ms var(--spring), border-color 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pf-clickable:hover {
+    translate: 0 -2px;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .pf-clickable:hover .pf-arrow {
+    color: #ffffff;
+    translate: 2px -2px;
+  }
+}
+
+.pf-clickable:active {
+  scale: 0.98;
+  transition: translate 250ms var(--ease-out), scale 110ms var(--ease-out);
+}
+
+.pf-clickable:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .pf-links {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Keep both pages off the screen edges on phones. */
+@media (max-width: 600px) {
+  .page-row {
+    padding: 0 16px;
+  }
+  .page-tab {
+    padding: 8px 14px;
+  }
+}
+
+/* ── Page tabs (profile / portfolio) ─────────────────────────────────────── */
+
+.liquid-glass.page-tabs {
+  position: fixed;
+  left: 50%;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  translate: -50% 0;
+  z-index: 90;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 99px;
+  animation: page-tabs-in 0.6s var(--ease-out) 0.5s both;
+}
+
+@keyframes page-tabs-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.page-tab {
+  position: relative;
+  z-index: 4;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 99px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: background-color 250ms var(--ease-out), color 200ms ease;
+}
+
+.page-tab.is-active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .page-tab:not(.is-active):hover {
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.page-tab:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-tabs { animation: none; }
+  .pf-clickable,
+  .pf-clickable:hover,
+  .pf-clickable:active { translate: none; scale: none; }
+}

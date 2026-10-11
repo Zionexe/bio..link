@@ -1,0 +1,488 @@
+/* ── DynamicIsland ───────────────────────────────────────────────────────── */
+/* Modeled on the iPhone Now Playing island: a pure black capsule that morphs
+   on a spring (slight overshoot on expand, tighter spring on collapse).
+   Artwork and waveform are shared elements riding the capsule's edges.
+   Spring curves live in index.css (--spring-expand / --spring-collapse). */
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+/* love her*/
+.di-wrap {
+  --di-open-w: 740ms;
+  --di-open-h: var(--spring-expand-dur);
+  --di-close-w: var(--spring-collapse-dur);
+  --di-close-h: 480ms;
+  --di-h: 37px;
+  --di-w-idle: 120px;
+  --di-w-compact: 196px;
+  --di-w-expanded: min(calc(100vw - 24px), 384px);
+  --di-h-expanded: 198px;
+
+  position: fixed;
+  top: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-text-stroke: 0;
+  animation: di-arrive 480ms var(--ease-out) 150ms both;
+}
+
+@keyframes di-arrive {
+  from { opacity: 0; transform: translateX(-50%) scale(0.85); }
+  to   { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+/* Capsule ----------------------------------------------------------------- */
+
+.di-pill {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  touch-action: none;
+  color: #ffffff;
+  background: #000000;
+  width: var(--di-w-compact);
+  height: var(--di-h);
+  border-radius: calc(var(--di-h) / 2); /* explicit radius so it interpolates cleanly */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transform-origin: 50% 0;
+
+  /* Collapse / resize: height retracts first, width follows and lands with
+     a slight squish. */
+  transition:
+    width var(--di-close-w) var(--spring-collapse),
+    height var(--di-close-h) var(--spring-collapse),
+    border-radius var(--di-close-h) var(--spring-collapse),
+    box-shadow 300ms ease,
+    transform var(--spring-dur) var(--spring);
+}
+
+.di-pill.is-idle {
+  width: var(--di-w-idle);
+}
+
+.di-pill.is-expanded {
+  width: var(--di-w-expanded);
+  height: var(--di-h-expanded);
+  border-radius: 44px;
+  cursor: default;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 22px 50px rgba(0, 0, 0, 0.55);
+  /* Expand: widens first, height trails, both overshoot a touch */
+  transition:
+    width var(--di-open-w) var(--spring-expand),
+    height var(--di-open-h) var(--spring-expand),
+    border-radius var(--di-open-h) var(--spring-expand),
+    box-shadow 500ms ease 80ms,
+    transform var(--spring-dur) var(--spring);
+}
+
+/* Touching the island makes it swell slightly under the finger. */
+.di-pill.is-compact:active,
+.di-pill.is-idle:active {
+  transform: scale(1.05);
+  transition:
+    width var(--di-close-w) var(--spring-collapse),
+    height var(--di-close-h) var(--spring-collapse),
+    border-radius var(--di-close-h) var(--spring-collapse),
+    transform 160ms var(--ease-out);
+}
+
+/* Swipe-up in progress: transform follows the finger with no lag. */
+.di-pill.is-dragging {
+  transition:
+    width var(--di-open-w) var(--spring-expand),
+    height var(--di-open-h) var(--spring-expand),
+    border-radius var(--di-open-h) var(--spring-expand),
+    transform 0s;
+}
+
+.di-pill:focus-visible {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.55);
+}
+
+/* Shared artwork ----------------------------------------------------------- */
+
+.di-art {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 15px;
+  object-fit: cover;
+  transform-origin: 0 0;
+  /* 23px square, 7px from the capsule's top-left */
+  transform: translate(8px, 7px) scale(0.3594);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition:
+    transform var(--di-close-w) var(--spring-collapse),
+    opacity 220ms var(--ease-out),
+    box-shadow 300ms ease;
+}
+
+.is-idle .di-art {
+  opacity: 0;
+  transform: translate(8px, 7px) scale(0.26);
+}
+
+.is-expanded .di-art {
+  transform: translate(24px, 24px) scale(1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+  transition:
+    transform var(--di-open-h) var(--spring-expand),
+    opacity 220ms var(--ease-out),
+    box-shadow 400ms ease 100ms;
+}
+
+/* Shared waveform ---------------------------------------------------------- */
+
+.di-wave-anchor {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 14px;
+  transform-origin: 100% 0;
+  transform: translate(-14px, 11.5px);
+  transition:
+    transform var(--di-close-w) var(--spring-collapse),
+    opacity 220ms var(--ease-out);
+}
+
+.is-idle .di-wave-anchor {
+  opacity: 0;
+  transform: translate(-14px, 11.5px) scale(0.6);
+}
+
+.is-expanded .di-wave-anchor {
+  transform: translate(-28px, 47px) scale(1.4);
+  transition:
+    transform var(--di-open-h) var(--spring-expand),
+    opacity 220ms var(--ease-out);
+}
+
+.di-wave {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+/* Heights are written per frame by useWaveform (audio-reactive springs). */
+.di-bar {
+  width: 2.4px;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--di-tint, #ffffff);
+  opacity: 0.5;
+  transform: scaleY(0.18);
+  transition: opacity 400ms ease, background-color 600ms ease;
+}
+
+.di-wave.is-playing .di-bar {
+  opacity: 1;
+}
+
+/* Expanded-only content ------------------------------------------------------
+   Leaves fast so it never fights the closing capsule; arrives a beat after
+   the capsule has room for it, growing out of the top edge. */
+
+.di-reveal {
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.94);
+  transform-origin: 50% 0;
+  filter: blur(6px);
+  pointer-events: none;
+  transition:
+    opacity 120ms var(--ease-out),
+    transform 200ms var(--ease-out),
+    filter 120ms var(--ease-out);
+}
+
+.is-expanded .di-reveal {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  pointer-events: auto;
+  transition:
+    opacity 300ms var(--ease-out) 110ms,
+    transform var(--spring-expand-dur) var(--spring-expand) 40ms,
+    filter 300ms var(--ease-out) 110ms;
+}
+
+/* Fixed widths from the final size, so text never reflows mid-morph. */
+.di-meta {
+  top: 34px;
+  left: 104px;
+  width: calc(var(--di-w-expanded) - 104px - 66px);
+}
+
+.di-meta-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  animation: di-meta-in 420ms var(--ease-out) both;
+}
+
+@keyframes di-meta-in {
+  from { transform: translateY(5px); filter: blur(4px); }
+  to   { transform: none; filter: none; }
+}
+
+.di-title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.di-marquee {
+  display: block;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.di-marquee.is-scrolling {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 8px, #000 calc(100% - 14px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 8px, #000 calc(100% - 14px), transparent 100%);
+}
+
+.di-marquee-text {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.di-marquee.is-scrolling .di-marquee-text {
+  animation: di-marquee linear 1.2s infinite;
+}
+
+/* Hold at the start, glide (constant speed), hold, glide back. */
+@keyframes di-marquee {
+  0%, 18%   { transform: translateX(0); }
+  50%, 68%  { transform: translateX(var(--shift)); }
+  100%      { transform: translateX(0); }
+}
+
+.di-artist {
+  font-size: 17px;
+  line-height: 22px;
+  letter-spacing: -0.01em;
+  color: rgba(235, 235, 245, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.di-bottom {
+  top: 110px;
+  left: 24px;
+  width: calc(var(--di-w-expanded) - 48px);
+}
+
+/* Scrubber: elapsed · bar · remaining, like iOS. No thumb — the bar
+   thickens while held. */
+.di-scrub {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 24px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.di-time {
+  flex-shrink: 0;
+  width: 38px;
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: rgba(235, 235, 245, 0.6);
+  transition: color 200ms ease;
+}
+
+.di-time:last-child {
+  text-align: right;
+}
+
+.di-scrub.is-scrubbing .di-time {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.di-scrub-bar {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.22);
+  transition: transform var(--spring-dur) var(--spring);
+}
+
+.di-scrub.is-scrubbing .di-scrub-bar {
+  transform: scaleY(1.6);
+}
+
+.di-scrub-fill {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+
+/* Transport ------------------------------------------------------------------ */
+
+.di-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  margin-top: 14px;
+}
+
+.di-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 48px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS press highlight: a soft disc blooms behind the glyph. */
+.di-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 54px;
+  height: 54px;
+  margin: -27px 0 0 -27px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  opacity: 0;
+  transform: scale(0.75);
+  transition: opacity 300ms ease, transform 300ms var(--ease-out);
+}
+
+.di-btn:active::before {
+  opacity: 1;
+  transform: scale(1);
+  transition-duration: 80ms;
+}
+
+.di-btn > svg {
+  width: 34px;
+  height: 23px;
+}
+
+.di-glyph svg {
+  width: 28px;
+  height: 30px;
+}
+
+.di-btn > svg,
+.di-btn > .di-glyph {
+  transition: transform var(--spring-dur) var(--spring);
+}
+
+.di-btn:active > svg,
+.di-btn:active > .di-glyph {
+  transform: scale(0.88);
+  transition: transform 100ms var(--ease-out);
+}
+
+.di-btn:focus-visible {
+  outline: none;
+}
+
+.di-btn:focus-visible::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Play ↔ pause: symbol replace — old glyph shrinks and blurs out while the
+   new one scales up in the same spot. */
+.di-glyph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.di-glyph svg {
+  transition:
+    opacity 180ms var(--ease-out),
+    transform var(--spring-dur) var(--spring),
+    filter 180ms var(--ease-out);
+}
+
+.di-glyph-pause svg,
+.di-btn-play.is-playing .di-glyph-play svg {
+  opacity: 0;
+  transform: scale(0.5);
+  filter: blur(4px);
+}
+
+.di-btn-play.is-playing .di-glyph-pause svg {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .di-btn:hover::before { opacity: 0.55; transform: scale(0.92); }
+  .di-btn:active::before { opacity: 1; transform: scale(1); }
+}
+
+/* Accessibility ----------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .di-wrap { animation: di-fade 200ms ease both; }
+  .di-pill,
+  .di-pill.is-expanded,
+  .di-pill.is-dragging { transition: box-shadow 200ms ease; }
+  .di-pill:active { transform: none !important; }
+  .di-art,
+  .is-expanded .di-art,
+  .di-wave-anchor,
+  .is-expanded .di-wave-anchor { transition: opacity 150ms ease; }
+  .di-reveal,
+  .is-expanded .di-reveal { transition: opacity 150ms ease; transform: none; filter: none; }
+  .di-meta-inner { animation: none; }
+  .di-marquee.is-scrolling .di-marquee-text { animation: none; }
+  .di-btn:active > svg,
+  .di-btn:active > .di-glyph { transform: none; }
+  .di-glyph svg { transition: opacity 150ms ease; transform: none !important; filter: none !important; }
+}
+
+@keyframes di-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

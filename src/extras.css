@@ -1,0 +1,366 @@
+/* ── Music page ──────────────────────────────────────────────────────────── */
+
+.mu-list {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.mu-row {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 34px 1fr auto 28px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  border: none;
+  border-radius: 11px;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.mu-row + .mu-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mu-index {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.mu-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mu-name {
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mu-artist {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.mu-time {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.mu-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  opacity: 0.6;
+  transition: opacity 200ms ease, background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.mu-row.is-current .mu-action,
+.mu-row:focus-visible .mu-action {
+  opacity: 1;
+}
+
+.mu-row.is-current .mu-name {
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mu-row:hover {
+    background: #ffffff;
+    color: #000000;
+  }
+  .mu-row:hover .mu-index,
+  .mu-row:hover .mu-time,
+  .mu-row:hover .mu-artist {
+    color: rgba(0, 0, 0, 0.55);
+  }
+  .mu-row:hover .mu-name {
+    text-shadow: none;
+    -webkit-text-stroke: 0;
+  }
+  .mu-row:hover .mu-action {
+    opacity: 1;
+    background: #000000;
+    color: #ffffff;
+    border-color: #000000;
+  }
+  .mu-row:hover .mu-bars i {
+    background: #000000;
+    box-shadow: none;
+  }
+}
+
+.mu-row:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: -2px;
+}
+
+.mu-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.mu-bars i {
+  width: 3px;
+  height: 100%;
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+  transform-origin: 50% 100%;
+  animation: lyc-eq 0.9s ease-in-out infinite alternate;
+}
+
+.mu-bars i:nth-child(2) { animation-duration: 0.62s; animation-delay: -0.3s; }
+.mu-bars i:nth-child(3) { animation-duration: 0.78s; animation-delay: -0.55s; }
+
+.mu-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mu-empty > * {
+  position: relative;
+  z-index: 4;
+}
+
+.mu-empty-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  animation: mu-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes mu-breathe {
+  0%, 100% { opacity: 0.3; transform: scale(0.85); }
+  50%      { opacity: 1; transform: scale(1.1); }
+}
+
+/* ── Custom cursor ───────────────────────────────────────────────────────── */
+
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1001;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.cursor-dot.is-visible,
+.cursor-ring.is-visible {
+  opacity: 1;
+}
+
+.cursor-dot span,
+.cursor-ring span {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.cursor-dot span {
+  left: -3px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  background: #ffffff;
+}
+
+.cursor-ring span {
+  left: -16px;
+  top: -16px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ffffff;
+  transition: transform 300ms var(--spring), background-color 200ms ease;
+}
+
+.cursor-ring.is-hover span {
+  transform: scale(1.6);
+  background: #ffffff;
+}
+
+.cursor-ring.is-down span {
+  transform: scale(0.8);
+}
+
+.cursor-ring.is-hover.is-down span {
+  transform: scale(1.35);
+}
+
+/* ── Page switching + tabs ───────────────────────────────────────────────── */
+
+/* ── Project pages (Velocity, Valtrix, getghosted) ───────────────────────── */
+
+.vn-pitch {
+  width: 100%;
+  padding: 20px 22px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.vn-pitch > * {
+  position: relative;
+  z-index: 4;
+}
+
+.vn-tagline {
+  font-size: clamp(20px, 5.4vw, 26px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.25);
+}
+
+.vn-desc {
+  margin-top: 10px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.vn-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.vn-feature {
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.vn-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.vn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex: 1 1 180px;
+  height: 50px;
+  padding: 0 20px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 0;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, translate 250ms var(--ease-out), scale 250ms var(--spring);
+}
+
+.vn-btn-primary {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+}
+
+.vn-btn-primary img.vn-btn-icon {
+  filter: invert(1);
+}
+
+.vn-btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vn-btn:hover { translate: 0 -2px; background: #ffffff; color: #000000; border-color: #ffffff; }
+  .vn-btn:hover img.vn-btn-icon { filter: invert(1); }
+  .vn-btn-primary:hover { background: transparent; color: #ffffff; }
+  .vn-btn-primary:hover img.vn-btn-icon { filter: none; }
+}
+
+.vn-btn:active {
+  scale: 0.97;
+  transition-duration: 110ms;
+}
+
+.vn-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.card.card-entered > *:nth-child(6) { animation-delay: 0.42s; }
+
+/* ── Tabs: six pages — scroll sideways on narrow screens ─────────────────── */
+
+.liquid-glass.page-tabs {
+  max-width: calc(100vw - 24px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.liquid-glass.page-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.page-tab {
+  flex-shrink: 0;
+}
+

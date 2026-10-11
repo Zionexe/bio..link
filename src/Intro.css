@@ -1,0 +1,162 @@
+/* ── Intro ─────────────────────────────────────────────────────────────── */
+/* Heavy "zion" rising out of a mask, a 000→100 counter on a hairline,
+   then the whole screen lifts away like a curtain. */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  background: #000000;
+  color: #ffffff;
+  font-family: "Inter", var(--font-ui);
+  transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.intro.is-leaving {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+/* Bright edge on the curtain's bottom as it lifts. */
+.intro::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.intro.is-leaving::after {
+  opacity: 1;
+}
+
+.intro-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  transition: transform 1s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.6s ease;
+}
+
+.intro.is-leaving .intro-stage {
+  transform: translateY(40vh);
+  opacity: 0;
+}
+
+.intro-word {
+  display: flex;
+  font-size: clamp(84px, 22vw, 200px);
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  padding-right: 0.06em;
+}
+
+.intro-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+
+.intro-letter {
+  display: inline-block;
+  transform: translateY(105%);
+  animation: intro-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes intro-rise {
+  to { transform: none; }
+}
+
+.intro-load {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(260px, 60vw);
+  opacity: 1;
+  transition: opacity 0.5s ease 0.2s;
+}
+
+.intro.is-done .intro-load {
+  opacity: 0.35;
+}
+
+.intro-bar {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+.intro-bar-fill {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+}
+
+.intro-count {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.intro-cta-label {
+  position: absolute;
+  left: 50%;
+  bottom: max(44px, 7vh);
+  translate: -50% 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out), color 0.2s ease;
+}
+
+.intro.is-done .intro-cta-label {
+  opacity: 1;
+  transform: none;
+  animation: intro-pulse 2.4s ease-in-out 0.8s infinite;
+}
+
+@keyframes intro-pulse {
+  0%, 100% { color: rgba(255, 255, 255, 0.5); }
+  50%      { color: rgba(255, 255, 255, 0.95); }
+}
+
+.intro.is-leaving .intro-cta-label {
+  opacity: 0;
+  transition-duration: 0.25s;
+}
+
+.intro:focus-visible .intro-cta-label {
+  outline: 1px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro { transition: opacity 0.4s ease; }
+  .intro.is-leaving { transform: none; opacity: 0; }
+  .intro-letter { animation: none; transform: none; }
+  .intro.is-leaving .intro-stage { transform: none; }
+  .intro.is-done .intro-cta-label { animation: none; }
+}
