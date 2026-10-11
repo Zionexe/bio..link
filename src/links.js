@@ -79,8 +79,8 @@ export const Ventures = [
 
 // Songs for the site's music player (Dynamic Island + music page).
 export const Tracks = [
-  { name: "7 MANN", artist: "", src: "https://res.cloudinary.com/dwrd1ukva/video/upload/v1790444270/7_MANN_ilubxv.mp3" },
-  { name: "All The Things She Said", artist: "", src: "https://res.cloudinary.com/dwrd1ukva/video/upload/v1790444191/All_The_Things_Se_Said_HardStyle_boqthf.mp3" },
+  { name: "Thuggish Ruggish Bone", artist: "Bone Thugs-N-Harmony", src: "https://res.cloudinary.com/pkkyvxha/video/upload/v1791757341/Thuggish_Ruggish_Bone.mp3" },
+  { name: "Glock In My Lap", artist: "21 Savage", src: "https://res.cloudinary.com/pkkyvxha/video/upload/v1791757442/Glock_In_My_Lap.mp3" },
 ];
 
 // Guestbook API (api/guestbook.js). Set to "" to hide the guestbook tab.
