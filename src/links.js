@@ -78,7 +78,7 @@ export const Ventures = [
 ];
 
 // Songs for the site's music player (Dynamic Island + music page).
-//   cover  — optional image for this song (e.g. "/covers/bone.jpg" in public/,
+//   cover  — optional image for this song (e.g. "/covers/misery.jpg" in public/,
 //            or a full https link). Songs without one use DefaultCover.
 //   secret — optional word: type it anywhere on the site to play this song.
 export const DefaultCover = "/pfp.jpg";
@@ -89,14 +89,19 @@ export const Tracks = [
     artist: "Bone Thugs-N-Harmony",
     src: "https://res.cloudinary.com/pkkyvxha/video/upload/v1791757341/Thuggish_Ruggish_Bone.mp3",
     cover: "",
-    secret: "bone",
   },
   {
     name: "Glock In My Lap",
     artist: "21 Savage",
     src: "https://res.cloudinary.com/pkkyvxha/video/upload/v1791757442/Glock_In_My_Lap.mp3",
     cover: "",
-    secret: "savage",
+  },
+  {
+    name: "misery",
+    artist: "pupsies",
+    src: "https://res.cloudinary.com/pkkyvxha/video/upload/v1791767086/pupsies_-_misery._Lyrics_1.mp3",
+    cover: "",
+    secret: "zack",
   },
 ];
 
