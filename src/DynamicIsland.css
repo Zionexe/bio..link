@@ -582,6 +582,7 @@
 .di-vol-slider {
   flex: 1;
   height: 24px;
+  font-size: 16px; /* never triggers iPhone zoom */
   margin: 0;
   background: transparent;
   cursor: pointer;
@@ -639,4 +640,28 @@
   .di-wrap { filter: none; }
   .di-peek,
   .di-pill.is-peek .di-peek { transition: opacity 150ms ease; transform: none; filter: none; }
+}
+
+/* Cover art: .di-art is now a frame; the image inside cross-fades per song. */
+.di-art {
+  display: block;
+  overflow: hidden;
+  background: #111111;
+}
+
+.di-art-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: di-art-in 520ms var(--ease-out) both;
+}
+
+@keyframes di-art-in {
+  from { opacity: 0; transform: scale(1.12); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .di-art-img { animation: none; }
 }

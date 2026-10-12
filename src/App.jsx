@@ -14,10 +14,11 @@ import Projects, { ProjectTile } from "./Projects";
 import Guestbook from "./Guestbook";
 import NotFound from "./NotFound";
 import AdminPanel from "./AdminPanel";
+import Confetti from "./Confetti";
 import { ContactButton, ContactSheet } from "./Contact";
 import Cursor from "./Cursor";
 import { PageTitle } from "./Text";
-import { DisplayName, Links, LocationText, Tracks, Ventures, GuestbookEndpoint, ContactEmail, SecretWord, AdminWord } from "./links";
+import { DisplayName, Links, LocationText, Tracks, Ventures, GuestbookEndpoint, ContactEmail, SecretWord, AdminWord, ConfettiWord, ViewMilestones, DefaultCover } from "./links";
 import "./App.css";
 import "./mono.css";
 import "./extras.css";
@@ -608,6 +609,20 @@ export default function App() {
   // seconds.
   const [egg, setEgg] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
+
+  // Small status pill under the island (secrets, milestones…).
+  const [toast, setToast] = useState(null); // { id, text, ms }
+  const toastTimer = useRef(0);
+  const showToast = useCallback((text, ms = 3600) => {
+    clearTimeout(toastTimer.current);
+    setToast({ id: Date.now(), text, ms });
+    toastTimer.current = setTimeout(() => setToast(null), ms);
+  }, []);
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  // Confetti burst — re-keyed so it can fire again.
+  const [confetti, setConfetti] = useState(0);
+  const fireConfetti = useCallback(() => setConfetti(Date.now()), []);
   const closeAdmin = useCallback(() => setAdminOpen(false), []);
   const lastTypedAt = useRef(0);
   useEffect(() => {
@@ -625,10 +640,25 @@ export default function App() {
         setAdminOpen(true);
         return;
       }
+      // Secret songs: each track's `secret` word plays it.
+      const song = Tracks.findIndex((t) => t.secret && buffer.endsWith(t.secret.toLowerCase()));
+      if (song >= 0) {
+        buffer = "";
+        playerApi.current?.play(song);
+        showToast(`secret track — ${Tracks[song].name}`);
+        return;
+      }
+      if (ConfettiWord && buffer.endsWith(ConfettiWord.toLowerCase())) {
+        buffer = "";
+        fireConfetti();
+        showToast("confetti!");
+        return;
+      }
       if (!buffer.endsWith(SecretWord.toLowerCase())) return;
       buffer = "";
       setEgg(false);
       requestAnimationFrame(() => setEgg(true));
+      showToast("you found the secret", 7000);
       clearTimeout(timer);
       timer = setTimeout(() => setEgg(false), 7000);
     };
@@ -637,7 +667,22 @@ export default function App() {
       document.removeEventListener("keydown", onKey);
       clearTimeout(timer);
     };
-  }, [entered]);
+  }, [entered, showToast, fireConfetti]);
+
+  // View milestones: whoever lands on 100, 1,000, 5,000… gets confetti.
+  const celebrated = useRef(false);
+  useEffect(() => {
+    if (!entered || celebrated.current || !viewsCount) return;
+    const last = ViewMilestones[ViewMilestones.length - 1] || Infinity;
+    const hit = ViewMilestones.includes(viewsCount) || (viewsCount > last && viewsCount % 10000 === 0);
+    if (!hit) return;
+    celebrated.current = true;
+    const t = setTimeout(() => {
+      fireConfetti();
+      showToast(`you're visitor #${viewsCount.toLocaleString()} — milestone`, 6000);
+    }, 1400);
+    return () => clearTimeout(t);
+  }, [entered, viewsCount, fireConfetti, showToast]);
 
   // Number keys jump between pages (ignored while typing).
   useEffect(() => {
@@ -870,15 +915,16 @@ export default function App() {
         ))}
       </Glass>
 
-      {egg && (
-        <div className="egg-toast" role="status">
+      {toast && (
+        <div key={`toast-${toast.id}`} className="egg-toast" role="status" style={{ animationDuration: `${toast.ms}ms` }}>
           <span className="egg-toast-dot" />
-          you found the secret
+          {toast.text}
         </div>
       )}
       {egg && <div className="egg-flash" aria-hidden="true" />}
+      {confetti > 0 && <Confetti key={`confetti-${confetti}`} onDone={() => setConfetti(0)} />}
 
-      <DynamicIsland tracks={Tracks} apiRef={playerApi} onStateChange={setPlayerState} />
+      <DynamicIsland tracks={Tracks} cover={DefaultCover} apiRef={playerApi} onStateChange={setPlayerState} />
       {DeviceEasterEggEnabled && deviceOverlay && <DeviceOverlay />}
       {HeartEasterEggEnabled && heartOverlay && <HeartOverlay onClose={() => setHeartOverlay(false)} />}
     </div>

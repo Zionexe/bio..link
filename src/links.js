@@ -78,9 +78,26 @@ export const Ventures = [
 ];
 
 // Songs for the site's music player (Dynamic Island + music page).
+//   cover  — optional image for this song (e.g. "/covers/bone.jpg" in public/,
+//            or a full https link). Songs without one use DefaultCover.
+//   secret — optional word: type it anywhere on the site to play this song.
+export const DefaultCover = "/pfp.jpg";
+
 export const Tracks = [
-  { name: "Thuggish Ruggish Bone", artist: "Bone Thugs-N-Harmony", src: "https://res.cloudinary.com/pkkyvxha/video/upload/v1791757341/Thuggish_Ruggish_Bone.mp3" },
-  { name: "Glock In My Lap", artist: "21 Savage", src: "https://res.cloudinary.com/pkkyvxha/video/upload/v1791757442/Glock_In_My_Lap.mp3" },
+  {
+    name: "Thuggish Ruggish Bone",
+    artist: "Bone Thugs-N-Harmony",
+    src: "https://res.cloudinary.com/pkkyvxha/video/upload/v1791757341/Thuggish_Ruggish_Bone.mp3",
+    cover: "",
+    secret: "bone",
+  },
+  {
+    name: "Glock In My Lap",
+    artist: "21 Savage",
+    src: "https://res.cloudinary.com/pkkyvxha/video/upload/v1791757442/Glock_In_My_Lap.mp3",
+    cover: "",
+    secret: "savage",
+  },
 ];
 
 // Guestbook API (api/guestbook.js). Set to "" to hide the guestbook tab.
@@ -91,6 +108,13 @@ export const ContactEmail = "";
 
 // Type this anywhere on the site to trigger the easter egg.
 export const SecretWord = "zion";
+
+// Type this anywhere to fire the confetti (same burst as a view milestone).
+export const ConfettiWord = "confetti";
+
+// View counts that set off confetti for whoever lands on them. Above the
+// last one, every 10,000 counts too.
+export const ViewMilestones = [100, 250, 500, 1000, 2500, 5000, 7500, 10000];
 
 // Type this anywhere on the site to open the admin panel. Note: anyone can
 // read this in the site's code — the panel itself is protected by the

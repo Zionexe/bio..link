@@ -158,7 +158,7 @@ const PauseIcon = () => (
   </svg>
 );
 
-export default function DynamicIsland({ tracks, cover = "/Track.png", apiRef, onStateChange }) {
+export default function DynamicIsland({ tracks, cover = "/pfp.jpg", apiRef, onStateChange }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [phase, setPhase] = useState("idle"); // "idle" | "compact" | "expanded"
@@ -171,9 +171,12 @@ export default function DynamicIsland({ tracks, cover = "/Track.png", apiRef, on
   const drag = useRef(null);
   const suppressClick = useRef(false); // the click that ends a swipe is not a tap
   const barsRef = useRef([]);
-  const tint = useArtworkTint(cover);
+
 
   const currentTrack = tracks[currentIndex];
+  // Each song can bring its own cover; otherwise the default (profile photo).
+  const coverSrc = currentTrack?.cover || cover;
+  const tint = useArtworkTint(coverSrc);
   const expanded = phase === "expanded";
 
   useWaveform(audioRef, barsRef, isPlaying);
@@ -460,7 +463,10 @@ export default function DynamicIsland({ tracks, cover = "/Track.png", apiRef, on
         />
 
         {/* Shared elements — same node in compact and expanded */}
-        <img src={cover} alt="" className="di-art" draggable="false" />
+        <span className="di-art">
+          {/* Re-keyed per cover so a new song's art cross-fades in. */}
+          <img key={coverSrc} src={coverSrc} alt="" className="di-art-img" draggable="false" />
+        </span>
         <span className="di-wave-anchor">
           <Waveform playing={isPlaying} ref={barsRef} />
         </span>
