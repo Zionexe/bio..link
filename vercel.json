@@ -4,6 +4,6 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "git": {
-    "deploymentEnabled": true
+    "deploymentEnabled": false
   }
 }
