@@ -49,6 +49,8 @@ export const Ventures = [
     description: "Premium moderation, security, and ticket management.",
     features: ["moderation", "security", "tickets"],
     invite: "valtrix",
+    // Live bot status dot — must match a name in api/_botstatus.js (SOURCES).
+    botStatus: "valtrix",
     links: [
       { label: "Visit website", href: "https://valtrixbot.xyz/", kind: "web" },
       { label: "Discord", href: "https://discord.gg/valtrix", kind: "discord" },

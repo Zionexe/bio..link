@@ -1268,3 +1268,91 @@
   height: 100%;
   pointer-events: none;
 }
+
+/* Bot status pill (Venture page, venture.botStatus) ------------------------- */
+
+.bot-status {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 10px;
+  padding: 6px 12px 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.92);
+  transition: border-color 0.4s ease, background 0.4s ease;
+  animation: bot-status-in 0.6s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) 0.35s both;
+}
+
+.bot-status-meta {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+.bot-status-dot {
+  position: relative;
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+/* online — solid white, glowing, with a ping ring */
+.bot-status-online { border-color: rgba(255, 255, 255, 0.28); }
+.bot-status-online .bot-status-dot {
+  background: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.85);
+}
+.bot-status-online .bot-status-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  animation: ping 2.4s var(--ease-out, ease-out) infinite;
+}
+
+/* offline — hollow grey ring */
+.bot-status-offline { color: rgba(255, 255, 255, 0.6); }
+.bot-status-offline .bot-status-dot {
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+}
+
+/* maintenance — half-filled dot */
+.bot-status-maintenance .bot-status-dot {
+  border: 1.5px solid #fff;
+  background: linear-gradient(90deg, #fff 50%, transparent 50%);
+}
+
+/* checking / unknown — dim, softly blinking */
+.bot-status-checking,
+.bot-status-unknown { color: rgba(255, 255, 255, 0.5); }
+.bot-status-checking .bot-status-dot,
+.bot-status-unknown .bot-status-dot {
+  background: rgba(255, 255, 255, 0.35);
+  animation: bot-status-blink 1.4s ease-in-out infinite;
+}
+.bot-status-unknown .bot-status-dot { animation: none; }
+
+@keyframes bot-status-blink {
+  50% { opacity: 0.3; }
+}
+
+@keyframes bot-status-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bot-status,
+  .bot-status-dot,
+  .bot-status-dot::after { animation: none !important; }
+}

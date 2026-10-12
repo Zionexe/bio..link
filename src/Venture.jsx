@@ -3,6 +3,7 @@ import { CountUp, Kicker } from "./Motion";
 import { PageTitle } from "./Text";
 import { ServerIcon } from "./Projects";
 import { useInvite, formatCount } from "./discordInvite";
+import { useBotStatus, formatUptime } from "./botStatus";
 
 // ---------------------------------------------------------------------------
 // Venture — detail page for one project: back link, server icon + name,
@@ -20,6 +21,40 @@ const WebGlyph = () => (
     <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
   </svg>
 );
+
+// Live status pill for a bot (venture.botStatus in links.js).
+function BotStatus({ bot }) {
+  const s = useBotStatus(bot);
+  let state = "checking";
+  let label = "checking status…";
+  if (s) {
+    if (s.online === null || s.online === undefined) {
+      state = "unknown";
+      label = "status unavailable";
+    } else if (s.maintenance) {
+      state = "maintenance";
+      label = "bot under maintenance";
+    } else if (s.online) {
+      state = "online";
+      label = "bot online";
+    } else {
+      state = "offline";
+      label = "bot offline";
+    }
+  }
+  const details = [];
+  if (state === "online") {
+    if (typeof s.latency === "number") details.push(`${Math.round(s.latency)}ms`);
+    if (typeof s.uptime === "number") details.push(`up ${formatUptime(s.uptime)}`);
+  }
+  return (
+    <span className={`bot-status bot-status-${state}`} role="status" aria-live="polite">
+      <i className="bot-status-dot" aria-hidden="true" />
+      <span className="bot-status-label">{label}</span>
+      {details.length > 0 && <span className="bot-status-meta">{details.join(" · ")}</span>}
+    </span>
+  );
+}
 
 export default function Venture({ venture, onBack }) {
   const server = useInvite(venture.invite);
@@ -41,6 +76,7 @@ export default function Venture({ venture, onBack }) {
           <div className="vn-title-text">
             <Kicker text={venture.kicker} delay={200} />
             <PageTitle text={venture.name} />
+            {venture.botStatus && <BotStatus bot={venture.botStatus} />}
           </div>
         </div>
       </div>
