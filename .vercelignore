@@ -1,0 +1,4 @@
+# Old Cloudflare version of the guestbook — not used on Vercel.
+guestbook-worker
+# Local-only guestbook messages from npm run dev / preview.
+.guestbook-local.json

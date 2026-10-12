@@ -35,10 +35,26 @@ export default function Guestbook({ endpoint }) {
 
   useEffect(() => {
     let cancelled = false;
+    // On failure, keep the reason so it's obvious what's wrong:
+    // 404 = the /api function isn't deployed, 503 = storage not connected.
     fetch(base)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then(async (r) => {
+        const isJson = (r.headers.get("content-type") || "").includes("json");
+        const d = isJson ? await r.json().catch(() => ({})) : {};
+        if (!r.ok || !isJson) {
+          const reason =
+            d.error ||
+            (r.status === 404 || !isJson ? "API not found (is /api deployed?)" : `server error ${r.status}`);
+          throw new Error(reason);
+        }
+        return d;
+      })
       .then((d) => { if (!cancelled) setEntries(d.entries || []); })
-      .catch(() => { if (!cancelled) { setOffline(true); setEntries([]); } });
+      .catch((err) => {
+        if (cancelled) return;
+        setOffline(err?.message && err.message !== "Failed to fetch" ? err.message : "can't reach the server");
+        setEntries([]);
+      });
     return () => { cancelled = true; };
   }, [base]);
 
@@ -104,7 +120,7 @@ export default function Guestbook({ endpoint }) {
         />
         <div className="gb-foot">
           <span className={`gb-status gb-status-${status.kind}`} aria-live="polite">
-            {offline ? "guestbook is offline right now" : status.text || `${message.length}/${MESSAGE_MAX}`}
+            {offline ? `offline — ${offline}` : status.text || `${message.length}/${MESSAGE_MAX}`}
           </span>
           <button type="submit" className="gb-send" disabled={!canSend}>
             sign

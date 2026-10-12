@@ -8,20 +8,35 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export function SplitText({ text, baseDelay = 0.16 }) {
   const chars = Array.from(text);
   const step = Math.min(0.035, 0.45 / Math.max(chars.length, 1));
-  return (
-    <span className="split-text">
-      {chars.map((ch, i) => (
+  // Letters are grouped into words that never break internally, so long
+  // titles wrap between words ("Velocity / Shop"), never mid-word.
+  const words = [];
+  let index = 0;
+  text.split(" ").forEach((word, w) => {
+    if (w > 0) {
+      words.push(" ");
+      index += 1;
+    }
+    const letters = Array.from(word).map((ch) => {
+      const i = index++;
+      return (
         <span
           key={i}
           className="split-char"
           aria-hidden="true"
           style={{ animationDelay: `${(baseDelay + i * step).toFixed(3)}s` }}
         >
-          {ch === " " ? " " : ch}
+          {ch}
         </span>
-      ))}
-    </span>
-  );
+      );
+    });
+    words.push(
+      <span key={`w${w}`} className="split-word">
+        {letters}
+      </span>
+    );
+  });
+  return <span className="split-text">{words}</span>;
 }
 
 // ---------------------------------------------------------------------------
