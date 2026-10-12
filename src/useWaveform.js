@@ -81,6 +81,8 @@ export function useWaveform(audioRef, barsRef, playing) {
       return { p: m ? parseFloat(m[1]) : REST, v: 0, t: REST, nextAt: 0 };
     });
 
+    // The island wrapper reads the average level as --lvl for its glow.
+    const wrap = bars[0].closest(".di-wrap");
     let raf = 0;
     let last = performance.now();
     let peak = 0.2;
@@ -134,6 +136,14 @@ export function useWaveform(audioRef, barsRef, playing) {
         else { s.p = s.t; s.v = 0; }
         bars[i].style.transform = `scaleY(${Math.min(1.12, Math.max(0.08, s.p)).toFixed(3)})`;
       });
+
+      if (wrap) {
+        const avg = state.reduce((sum, st) => sum + st.p, 0) / state.length;
+        // Squared so quiet passages barely glow and only the hits really flare.
+        const raw = Math.max(0, Math.min(1, (avg - REST) / (1 - REST)));
+        const lvl = playing && !reduce ? raw * raw : 0;
+        wrap.style.setProperty("--lvl", lvl.toFixed(3));
+      }
 
       raf = moving ? requestAnimationFrame(step) : 0;
     };

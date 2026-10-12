@@ -117,6 +117,34 @@ const ForwardIcon = () => (
   </svg>
 );
 
+const VOLUME_KEY = "zion-volume";
+const DEFAULT_VOLUME = 0.4;
+
+function readVolume() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(VOLUME_KEY) || "null");
+    if (saved && typeof saved.volume === "number") {
+      return { volume: Math.min(1, Math.max(0, saved.volume)), muted: Boolean(saved.muted) };
+    }
+  } catch { /* storage blocked */ }
+  return { volume: DEFAULT_VOLUME, muted: false };
+}
+
+// Speaker glyph with 0–2 sound waves depending on the level.
+const SpeakerIcon = ({ level }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M4 9.5h3.2L12 5.6v12.8l-4.8-3.9H4a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1Z" fill="currentColor" />
+    {level === 0 ? (
+      <path d="m16 9.5 5 5m0-5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    ) : (
+      <>
+        <path d="M15.5 9a4 4 0 0 1 0 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        {level > 0.5 && <path d="M18.3 6.5a7.5 7.5 0 0 1 0 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />}
+      </>
+    )}
+  </svg>
+);
+
 const PlayIcon = () => (
   <svg width="26" height="28" viewBox="0 0 26 28" fill="currentColor" aria-hidden="true">
     <path d="M4 3.6v20.8c0 1.2 1.3 1.9 2.3 1.3l17-10.4c1-.6 1-2 0-2.6l-17-10.4C5.3 1.7 4 2.4 4 3.6Z" />
@@ -185,11 +213,33 @@ export default function DynamicIsland({ tracks, cover = "/Track.png", apiRef, on
     };
   });
 
+  // Volume: 40% by default; each visitor's choice (and mute) is remembered.
+  const [volume, setVolume] = useState(() => readVolume().volume);
+  const [muted, setMuted] = useState(() => readVolume().muted);
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.volume = 0.40;
-  }, []);
+    audio.volume = volume;
+    audio.muted = muted;
+    try { localStorage.setItem(VOLUME_KEY, JSON.stringify({ volume, muted })); } catch { /* storage blocked */ }
+  }, [volume, muted]);
+
+  // "Now playing" peek: when a song starts or changes, the capsule briefly
+  // stretches out to show the title, like the iPhone's Dynamic Island.
+  const [peek, setPeek] = useState(false);
+  const peekTimer = useRef(0);
+  const hasPlayed = useRef(false);
+  const lastPeekIndex = useRef(-1);
+  useEffect(() => {
+    if (!isPlaying) return;
+    if (hasPlayed.current && lastPeekIndex.current === currentIndex) return;
+    hasPlayed.current = true;
+    lastPeekIndex.current = currentIndex;
+    clearTimeout(peekTimer.current);
+    setPeek(true);
+    peekTimer.current = setTimeout(() => setPeek(false), 3200);
+  }, [isPlaying, currentIndex]);
+  useEffect(() => () => clearTimeout(peekTimer.current), []);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -245,7 +295,7 @@ export default function DynamicIsland({ tracks, cover = "/Track.png", apiRef, on
   // --- Swipe up to collapse (expanded only) ---------------------------------
   const onPillPointerDown = (e) => {
     if (!expanded || e.button !== 0) return;
-    if (e.target.closest("button, .di-scrub")) return;
+    if (e.target.closest("button, .di-scrub, .di-volume")) return;
     drag.current = { id: e.pointerId, y0: e.clientY, dy: 0, samples: [{ y: e.clientY, t: e.timeStamp }] };
     try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* pointer already released */ }
   };
@@ -373,7 +423,7 @@ export default function DynamicIsland({ tracks, cover = "/Track.png", apiRef, on
     <div className="di-wrap" ref={wrapRef}>
       <div
         ref={pillRef}
-        className={`di-pill is-${phase}`}
+        className={`di-pill is-${phase}${peek && phase === "compact" ? " is-peek" : ""}${isPlaying ? " is-live" : ""}`}
         style={tint ? { "--di-tint": tint } : undefined}
         role="button"
         tabIndex={0}
@@ -413,6 +463,12 @@ export default function DynamicIsland({ tracks, cover = "/Track.png", apiRef, on
         <img src={cover} alt="" className="di-art" draggable="false" />
         <span className="di-wave-anchor">
           <Waveform playing={isPlaying} ref={barsRef} />
+        </span>
+
+        {/* Compact "now playing" peek */}
+        <span className="di-peek" aria-hidden={!peek}>
+          <span className="di-peek-title">{currentTrack.name}</span>
+          {currentTrack.artist && <span className="di-peek-artist">{currentTrack.artist}</span>}
         </span>
 
         {/* Expanded-only content */}
@@ -456,6 +512,35 @@ export default function DynamicIsland({ tracks, cover = "/Track.png", apiRef, on
             <button className="di-btn" onClick={skip(1)} aria-label="Next track" tabIndex={expanded ? 0 : -1}>
               <ForwardIcon />
             </button>
+          </div>
+
+          <div className="di-volume" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="di-vol-btn"
+              onClick={() => setMuted((m) => !m)}
+              aria-label={muted || volume === 0 ? "Unmute" : "Mute"}
+              tabIndex={expanded ? 0 : -1}
+            >
+              <SpeakerIcon level={muted ? 0 : volume} />
+            </button>
+            <input
+              className="di-vol-slider"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={muted ? 0 : volume}
+              style={{ "--vol": muted ? 0 : volume }}
+              onChange={(e) => {
+                const v = parseFloat(e.target.value);
+                setVolume(v);
+                setMuted(v === 0);
+              }}
+              aria-label="Volume"
+              tabIndex={expanded ? 0 : -1}
+            />
+            <span className="di-vol-pct" aria-hidden="true">{Math.round((muted ? 0 : volume) * 100)}</span>
           </div>
         </div>
       </div>
