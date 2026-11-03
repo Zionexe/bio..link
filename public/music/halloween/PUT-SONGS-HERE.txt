@@ -1,8 +1,0 @@
-Put this theme's songs in this folder with these exact file names:
-
-  thriller.mp3    <- Thriller - Michael Jackson
-  ghostbusters.mp3    <- Ghostbusters - Ray Parker Jr.
-  somebodys-watching-me.mp3    <- Somebody's Watching Me - Rockwell
-
-Songs whose file isn't here are skipped. To add more songs, add them to
-the "halloween" theme's tracks list in src/themes.js.
