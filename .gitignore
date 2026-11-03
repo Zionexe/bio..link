@@ -24,6 +24,7 @@ node_modules
 *.sw?
 # Local guestbook messages (npm run dev / preview)
 .guestbook-local.json
+.settings-local.json
 
 # Secrets and Vercel CLI state
 .env

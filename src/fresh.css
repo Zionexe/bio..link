@@ -1,0 +1,574 @@
+/* ══ Fresh look ══════════════════════════════════════════════════════════════
+   Black page, interactive star network behind everything, frosted-glass
+   cards on top. Loaded last, so it wins over the older stylesheets.
+   Remove the import in App.jsx to go back to the previous look. */
+
+:root {
+  --glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.02));
+  --glass-border: rgba(255, 255, 255, 0.11);
+  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 60px rgba(0, 0, 0, 0.6);
+  --glass-blur: blur(16px) saturate(140%);
+  --glass-radius: 22px;
+}
+
+/* Let the network (rendered at the app root) show through the page. */
+.page {
+  background-color: transparent;
+}
+
+/* ── Home: profile card ─────────────────────────────────────────────────── */
+
+.card.home-card {
+  width: min(500px, 100%);
+}
+.card.home-card > * + * {
+  margin-top: 12px;
+}
+
+.profile-card {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 22px 20px;
+  border-radius: var(--glass-radius);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  -webkit-text-stroke: 0;
+}
+
+/* Light catches the top edge of the card. */
+.profile-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 18% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  pointer-events: none;
+}
+
+.pc-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.profile-card .avatar {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18), 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.pc-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.pc-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.75);
+}
+.pc-pill svg {
+  opacity: 0.7;
+}
+
+.pc-name-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+
+.profile-card .hero-name {
+  font-size: clamp(30px, 8vw, 38px);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-shadow: 0 0 26px rgba(255, 255, 255, 0.28);
+}
+
+.profile-card .badge-row {
+  translate: 0 2px;
+}
+
+.pc-bio {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.62);
+}
+.pc-bio .typewriter-cursor {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.pc-icons {
+  justify-content: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+
+/* ── Home: Discord status card ──────────────────────────────────────────── */
+
+.home-card .duo-row {
+  border-radius: 18px;
+  padding: 10px 14px 10px 10px;
+  border-color: var(--glass-border);
+}
+.home-card .duo-row .avatar-wrap-sm,
+.home-card .duo-row .avatar-sm {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  max-width: 46px;
+  max-height: 46px;
+}
+.home-card .duo-row .avatar-wrap-sm::before {
+  display: none;
+}
+.home-card .duo-row .status-dot {
+  width: 14px;
+  height: 14px;
+  border-width: 2.5px;
+}
+.home-card .duo-status-line {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ── Other pages: the whole page sits on a glass panel ─────────────────── */
+
+.card.pf-card:not(.home-card) {
+  padding: 26px 26px 22px;
+  border-radius: 26px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* Project tiles and link rows: soft glow on hover instead of turning white. */
+@media (hover: hover) and (pointer: fine) {
+  .pt:hover,
+  .pf-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.32);
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 12px 34px rgba(0, 0, 0, 0.5), 0 0 28px rgba(255, 255, 255, 0.07);
+  }
+  .pt:hover .pt-kicker,
+  .pt:hover .pt-online,
+  .pf-link:hover .pf-link-handle { color: rgba(255, 255, 255, 0.6); }
+  .pt:hover .pt-tagline,
+  .pf-link:hover .pf-link-label,
+  .pt:hover .pt-arrow,
+  .pf-link:hover .pf-arrow { color: #ffffff; }
+  .pt:hover .live-dot { background: #ffffff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.7); }
+  .pt:hover .srv-icon { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25); }
+  .pt:hover .pt-glare {
+    background: radial-gradient(circle at var(--tx, 50%) var(--ty, 0%), rgba(255, 255, 255, 0.16), transparent 55%);
+  }
+  .pf-link:hover .pf-link-icon { filter: none; }
+}
+
+/* Phones */
+@media (max-width: 520px) {
+  .profile-card { padding: 18px 16px 16px; }
+  .profile-card .avatar-wrap,
+  .profile-card .avatar {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    min-height: 72px;
+    max-width: 72px;
+    max-height: 72px;
+  }
+  .card.pf-card:not(.home-card) { padding: 20px 16px 16px; border-radius: 22px; }
+}
+
+/* ── Tab bar: glass pill that follows the mouse (App.jsx onTabsMove) ───── */
+.tab-hover {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  z-index: 2;
+  width: 0;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32), 0 0 22px rgba(255, 255, 255, 0.14);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 460ms var(--spring-expand),
+    width 460ms var(--spring-expand),
+    opacity 220ms ease;
+}
+.page-tab {
+  position: relative;
+  z-index: 4;
+}
+@media (hover: hover) and (pointer: fine) {
+  .page-tab:not(.is-active):hover { color: #ffffff; }
+}
+
+/* ── 3D tilt (src/tilt.js) — home cards lean toward the mouse ──────────── */
+.tilt {
+  --rx: 0deg;
+  --ry: 0deg;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 700ms var(--spring-expand), box-shadow 300ms ease;
+  will-change: transform;
+  /* Entrance animations release `transform` when done, so the tilt can use it. */
+  animation-fill-mode: backwards !important;
+}
+.tilt.is-tilting {
+  transition: transform 140ms var(--ease-out), box-shadow 300ms ease;
+}
+.profile-card.tilt.is-tilting {
+  box-shadow: var(--glass-shadow), 0 34px 80px rgba(0, 0, 0, 0.65);
+}
+
+/* Light spot that follows the mouse across the profile card. */
+.profile-card.tilt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--tx, 50%) var(--ty, 0%), rgba(255, 255, 255, 0.11), transparent 52%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.profile-card.tilt.is-tilting::after {
+  opacity: 1;
+}
+
+/* Project tiles already tilt — keep it on with reduced motion too. */
+@media (prefers-reduced-motion: reduce) {
+  .pt { transform: perspective(700px) rotateX(var(--rx)) rotateY(var(--ry)); }
+}
+
+/* ══ Seasonal themes (themes.js, picked in the admin panel) ═════════════════
+   App.jsx sets data-theme on <html> and --accent-rgb / --accent2-rgb. */
+
+.season-fx {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  animation: fade-in 1.2s ease both;
+}
+
+.theme-badge {
+  font-size: 22px;
+  line-height: 1;
+  -webkit-text-stroke: 0;
+  filter: drop-shadow(0 0 10px rgba(var(--accent-rgb, 255, 255, 255), 0.6));
+  animation: theme-bob 2.6s ease-in-out infinite;
+}
+@keyframes theme-bob {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50%      { transform: translateY(-3px) rotate(6deg); }
+}
+
+html[data-theme]:not([data-theme="default"]) {
+  --glass-border: rgba(var(--accent-rgb), 0.3);
+}
+html[data-theme]:not([data-theme="default"]) ::selection {
+  background: rgb(var(--accent-rgb));
+  color: #000000;
+}
+html[data-theme]:not([data-theme="default"]) .profile-card,
+html[data-theme]:not([data-theme="default"]) .card.pf-card:not(.home-card) {
+  box-shadow:
+    var(--glass-shadow),
+    0 0 60px -16px rgba(var(--accent-rgb), 0.5),
+    0 0 110px -40px rgba(var(--accent2-rgb), 0.45);
+}
+html[data-theme]:not([data-theme="default"]) .profile-card::before {
+  inset: 0 10% auto;
+  background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.9), rgba(var(--accent2-rgb), 0.9), transparent);
+}
+html[data-theme]:not([data-theme="default"]) .profile-card .hero-name {
+  text-shadow: 0 0 22px rgba(var(--accent-rgb), 0.6), 0 0 48px rgba(var(--accent2-rgb), 0.3);
+}
+html[data-theme]:not([data-theme="default"]) .pc-pill {
+  border-color: rgba(var(--accent-rgb), 0.3);
+}
+html[data-theme]:not([data-theme="default"]) .tab-hover {
+  background: rgba(var(--accent-rgb), 0.22);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.5), 0 0 22px rgba(var(--accent-rgb), 0.25);
+}
+html[data-theme]:not([data-theme="default"]) .tab-indicator {
+  box-shadow: 0 0 22px rgba(var(--accent-rgb), 0.55);
+}
+html[data-theme]:not([data-theme="default"]) .egg-toast {
+  border-color: rgba(var(--accent-rgb), 0.45);
+  box-shadow: 0 0 30px -6px rgba(var(--accent-rgb), 0.5);
+}
+
+/* Admin panel — theme picker */
+.admin-themes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+.admin-theme {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.82);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s var(--ease-out);
+}
+.admin-theme span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-theme-emoji {
+  font-size: 18px;
+  -webkit-text-stroke: 0;
+}
+.admin-theme:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+.admin-theme.is-on {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #000000;
+  -webkit-text-stroke: 0;
+}
+.admin-theme:disabled { cursor: progress; opacity: 0.7; }
+@media (max-width: 420px) {
+  .admin-themes { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ══ Seasonal themes — the big stuff ═══════════════════════════════════════ */
+
+/* Coloured light pooling in from the corners behind the web. */
+html[data-theme]:not([data-theme="default"]) .network-bg {
+  background:
+    radial-gradient(60% 55% at 8% 0%, rgba(var(--accent-rgb), 0.2), transparent 70%),
+    radial-gradient(55% 50% at 95% 100%, rgba(var(--accent2-rgb), 0.17), transparent 70%),
+    radial-gradient(40% 35% at 50% 50%, rgba(var(--accent-rgb), 0.05), transparent 80%),
+    #000000;
+  transition: background 0.8s ease;
+}
+
+/* Glass picks up a hint of the theme colour. */
+html[data-theme]:not([data-theme="default"]) {
+  --glass-bg: linear-gradient(180deg, rgba(var(--accent-rgb), 0.09), rgba(255, 255, 255, 0.02) 55%, rgba(var(--accent2-rgb), 0.06));
+}
+
+/* Name: letters cycle through light tints of the theme colours, with a glow
+   that breathes between the two accents. (Per letter, because the name is
+   split into animated letters — gradient-clipped text can't span them.) */
+html[data-theme]:not([data-theme="default"]) .profile-card .hero-name {
+  text-shadow: none;
+  -webkit-text-stroke: 0;
+  animation: theme-name-glow 4s ease-in-out infinite;
+}
+html[data-theme]:not([data-theme="default"]) .profile-card .hero-name .split-char {
+  -webkit-text-stroke: 0;
+  transition: color 0.6s ease;
+}
+html[data-theme]:not([data-theme="default"]) .profile-card .hero-name .split-char:nth-child(3n + 1) {
+  color: #ffffff;
+}
+html[data-theme]:not([data-theme="default"]) .profile-card .hero-name .split-char:nth-child(3n + 2) {
+  color: color-mix(in srgb, rgb(var(--accent-rgb)) 55%, #ffffff);
+}
+html[data-theme]:not([data-theme="default"]) .profile-card .hero-name .split-char:nth-child(3n) {
+  color: color-mix(in srgb, rgb(var(--accent2-rgb)) 55%, #ffffff);
+}
+@keyframes theme-name-glow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(var(--accent-rgb), 0.75)) drop-shadow(0 0 26px rgba(var(--accent-rgb), 0.35)); }
+  50%      { filter: drop-shadow(0 0 10px rgba(var(--accent2-rgb), 0.75)) drop-shadow(0 0 26px rgba(var(--accent2-rgb), 0.35)); }
+}
+
+/* Intro: name glows in the theme colour, emoji after the site line. */
+html[data-theme]:not([data-theme="default"]) .intro-word {
+  filter: drop-shadow(0 0 22px rgba(var(--accent-rgb), 0.7)) drop-shadow(0 0 60px rgba(var(--accent2-rgb), 0.35));
+}
+html[data-theme]:not([data-theme="default"]) .intro-sub::after {
+  content: var(--theme-emoji, "");
+  letter-spacing: 0;
+}
+
+/* ── Card decorations (ThemeDecor.jsx) ──────────────────────────────────── */
+.profile-card .pc-top { position: relative; z-index: 2; }
+
+.decor {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Lights / garland / bunting hang from a wire along the top edge. */
+.decor-hang {
+  top: -7px;
+  left: 18px;
+  right: 18px;
+  height: 18px;
+}
+.decor-wire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.decor-wire path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.decor-bulb {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 12px;
+  margin-left: -4px;
+  border-radius: 50% 50% 46% 46% / 40% 40% 60% 60%;
+  background: rgb(var(--c));
+  box-shadow: 0 0 8px 2px rgba(var(--c), 0.85), 0 0 22px 4px rgba(var(--c), 0.45);
+  animation: bulb-twinkle 2.2s ease-in-out var(--d) infinite;
+}
+.decor-bulb::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 1.5px;
+  width: 5px;
+  height: 4px;
+  border-radius: 1px;
+  background: #3a3a3a;
+}
+@keyframes bulb-twinkle {
+  0%, 100% { opacity: 1; filter: brightness(1.15); }
+  50%      { opacity: 0.35; filter: brightness(0.7); box-shadow: 0 0 3px rgba(var(--c), 0.5); }
+}
+
+.decor-charm {
+  position: absolute;
+  top: 42%;
+  font-size: 17px;
+  line-height: 1;
+  translate: -50% 0;
+  -webkit-text-stroke: 0;
+  transform-origin: 50% 0;
+  rotate: var(--r);
+  animation: charm-sway 3.2s ease-in-out var(--d) infinite alternate;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+@keyframes charm-sway {
+  from { rotate: calc(var(--r) * -1); }
+  to   { rotate: var(--r); }
+}
+
+.decor-flag {
+  position: absolute;
+  top: 40%;
+  width: 18px;
+  height: 20px;
+  translate: -50% 0;
+  background: rgb(var(--c));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: 50% 0;
+  animation: charm-sway 2.6s ease-in-out var(--d) infinite alternate;
+  --r: 7deg;
+  filter: drop-shadow(0 0 6px rgba(var(--c), 0.5));
+}
+
+/* Halloween: cobweb in the corner, spider bobbing on its thread. */
+.decor-web {
+  top: -1px;
+  right: -1px;
+  width: 118px;
+  height: 118px;
+  z-index: 1;
+  overflow: hidden;
+  border-top-right-radius: var(--glass-radius);
+}
+.decor-web-svg {
+  width: 100%;
+  height: 100%;
+  border-top-right-radius: 22px;
+  overflow: visible;
+}
+.decor-web-svg line,
+.decor-web-svg path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 0.7;
+}
+.decor-spider {
+  position: absolute;
+  top: 0;
+  right: 50px;
+  font-size: 18px;
+  line-height: 1;
+  -webkit-text-stroke: 0;
+  animation: spider-drop 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.6));
+}
+.decor-thread {
+  position: absolute;
+  bottom: 70%;
+  left: 50%;
+  width: 1px;
+  height: 160px;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+}
+@keyframes spider-drop {
+  0%, 100% { transform: translateY(26px); }
+  50%      { transform: translateY(58px); }
+}
+
+/* Mouse trail sits above the cards (but under the intro and dialogs). */
+.season-trail {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 95;
+  pointer-events: none;
+}

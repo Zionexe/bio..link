@@ -9,7 +9,7 @@ export function SplitText({ text, baseDelay = 0.16 }) {
   const chars = Array.from(text);
   const step = Math.min(0.035, 0.45 / Math.max(chars.length, 1));
   // Letters are grouped into words that never break internally, so long
-  // titles wrap between words ("Velocity / Shop"), never mid-word.
+  // titles wrap between words ("404x / Shop"), never mid-word.
   const words = [];
   let index = 0;
   text.split(" ").forEach((word, w) => {

@@ -1356,3 +1356,110 @@
   .bot-status-dot,
   .bot-status-dot::after { animation: none !important; }
 }
+
+/* ---------------------------------------------------------------------------
+   Share button (icon row) — a bare icon like the social links.
+   --------------------------------------------------------------------------- */
+.share-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+.share-btn .icon-img {
+  width: 22px;
+  min-width: 22px;
+  max-width: 22px;
+  height: 22px;
+  min-height: 22px;
+  max-height: 22px;
+}
+.share-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------
+   Admin panel — 3 stat tiles + last-7-days view bars.
+   --------------------------------------------------------------------------- */
+.admin-stats.admin-stats-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 420px) {
+  .admin-stats.admin-stats-3 .admin-stat-num { font-size: 22px; }
+  .admin-stats.admin-stats-3 .admin-stat { padding: 12px; }
+}
+.admin-chart {
+  margin-top: 10px;
+  padding: 14px 16px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+}
+.admin-chart-bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: end;
+  gap: 8px;
+  height: 72px;
+  margin-top: 10px;
+}
+.admin-chart-bar {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+.admin-chart-bar > span {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 4px 4px 2px 2px;
+  background: rgba(255, 255, 255, 0.85);
+}
+.admin-chart-bar.is-today > span { background: #ffffff; box-shadow: 0 0 12px rgba(255, 255, 255, 0.4); }
+.admin-chart-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---------------------------------------------------------------------------
+   Odd number of projects: the last tile sits centered on its own row
+   (e.g. 404x Shop under Valtrix + Getghosted), same width as the others.
+   --------------------------------------------------------------------------- */
+.home-projects > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: calc(50% - 5px);
+}
+@media (min-width: 521px) {
+  .pt-grid > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 6px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Interactive network background (src/NetworkBackground.jsx).
+   --------------------------------------------------------------------------- */
+.network-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  display: block;
+  pointer-events: none;
+  background: #000000;
+  animation: fade-in 1.4s var(--ease-out) both;
+}
+
+/* Pure black background: no film grain over the page. */
+body::after { content: none; }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Glass from "./Glass";
 import { Kicker } from "./Motion";
+import { Themes } from "./themes";
 
 // ---------------------------------------------------------------------------
 // Admin panel — opened by typing the AdminWord (links.js) anywhere.
@@ -25,12 +26,16 @@ function when(ms) {
   return new Date(ms).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
-export default function AdminPanel({ open, onClose, endpoint, views }) {
+const dayLabel = (iso) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString(undefined, { weekday: "short" }).slice(0, 2);
+
+export default function AdminPanel({ open, onClose, endpoint, viewsEndpoint, views, settingsEndpoint, theme, onThemeChange }) {
   const [token, setToken] = useState(readToken);
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [entries, setEntries] = useState(null);
+  const [viewStats, setViewStats] = useState(null); // { total, days: [{ date, count }] }
   const inputRef = useRef(null);
 
   const auth = useCallback((t) => ({ Authorization: `Bearer ${t}` }), []);
@@ -43,7 +48,16 @@ export default function AdminPanel({ open, onClose, endpoint, views }) {
     return () => { document.removeEventListener("keydown", onKey); clearTimeout(t); };
   }, [open, onClose]);
 
+  const loadStats = useCallback(async (t) => {
+    if (!viewsEndpoint || !t) return;
+    try {
+      const r = await fetch(`${viewsEndpoint}?stats=admin`, { headers: { Authorization: `Bearer ${t}` } });
+      if (r.ok) setViewStats(await r.json());
+    } catch { /* counter offline — tiles show "—" */ }
+  }, [viewsEndpoint]);
+
   const load = useCallback(async () => {
+    loadStats(readToken());
     if (!endpoint) return;
     try {
       const r = await fetch(endpoint);
@@ -52,7 +66,7 @@ export default function AdminPanel({ open, onClose, endpoint, views }) {
     } catch {
       setStatus("Couldn't load messages.");
     }
-  }, [endpoint]);
+  }, [endpoint, loadStats]);
 
   // Re-check a saved password when the panel opens.
   useEffect(() => {
@@ -77,7 +91,12 @@ export default function AdminPanel({ open, onClose, endpoint, views }) {
     setStatus("");
     try {
       const r = await fetch(`${endpoint}?check=admin`, { headers: auth(password) });
-      if (!r.ok) throw new Error(r.status === 401 ? "Wrong password." : "Server unavailable.");
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        throw new Error(
+          r.status === 401 ? "Wrong password." : r.status === 429 ? (d.error || "Too many tries — wait 15 minutes.") : "Server unavailable."
+        );
+      }
       writeToken(password);
       setToken(password);
       setPassword("");
@@ -103,12 +122,39 @@ export default function AdminPanel({ open, onClose, endpoint, views }) {
     }
   };
 
+  // Seasonal theme — saved on the server, so every visitor gets it.
+  const saveTheme = async (id) => {
+    if (!settingsEndpoint || busy || id === theme) return;
+    setBusy(true);
+    setStatus("Saving theme…");
+    try {
+      const r = await fetch(settingsEndpoint, {
+        method: "POST",
+        headers: { ...auth(token), "Content-Type": "application/json" },
+        body: JSON.stringify({ theme: id }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.status === 401) { writeToken(""); setToken(""); throw new Error("Signed out — password changed?"); }
+      if (!r.ok) throw new Error(d.error || "Couldn't save theme.");
+      onThemeChange?.(d.theme);
+      setStatus(`Theme saved — everyone sees ${Themes.find((t) => t.id === d.theme)?.label || d.theme} now.`);
+    } catch (err) {
+      setStatus(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const signOut = () => {
     writeToken("");
     setToken("");
     setEntries(null);
+    setViewStats(null);
     setStatus("");
   };
+
+  const today = viewStats?.days?.[viewStats.days.length - 1]?.count;
+  const peak = Math.max(1, ...(viewStats?.days || []).map((d) => d.count));
 
   return (
     <div className="contact-overlay admin-overlay" onClick={onClose}>
@@ -150,16 +196,64 @@ export default function AdminPanel({ open, onClose, endpoint, views }) {
           </form>
         ) : (
           <>
-            <div className="admin-stats">
+            <div className="admin-stats admin-stats-3">
               <div className="admin-stat">
-                <span className="admin-stat-num">{typeof views === "number" ? views.toLocaleString() : "—"}</span>
-                <span className="admin-stat-label">Page views</span>
+                <span className="admin-stat-num">
+                  {(viewStats?.total ?? views)?.toLocaleString?.() ?? "—"}
+                </span>
+                <span className="admin-stat-label">Total views</span>
+              </div>
+              <div className="admin-stat">
+                <span className="admin-stat-num">{typeof today === "number" ? today.toLocaleString() : "—"}</span>
+                <span className="admin-stat-label">Today</span>
               </div>
               <div className="admin-stat">
                 <span className="admin-stat-num">{entries ? entries.length : "—"}</span>
-                <span className="admin-stat-label">Guestbook messages</span>
+                <span className="admin-stat-label">Messages</span>
               </div>
             </div>
+
+            {viewStats?.days && (
+              <div className="admin-chart" aria-label="Unique visitors, last 7 days">
+                <span className="admin-stat-label">Visitors — last 7 days</span>
+                <div className="admin-chart-bars">
+                  {viewStats.days.map((d, i) => (
+                    <div
+                      key={d.date}
+                      className={`admin-chart-bar${i === viewStats.days.length - 1 ? " is-today" : ""}`}
+                      title={`${d.date}: ${d.count}`}
+                    >
+                      <span style={{ height: `${(d.count / peak) * 100}%` }} />
+                    </div>
+                  ))}
+                </div>
+                <div className="admin-chart-days" aria-hidden="true">
+                  {viewStats.days.map((d) => <span key={d.date}>{dayLabel(d.date)}</span>)}
+                </div>
+              </div>
+            )}
+
+            {settingsEndpoint && (
+              <div className="admin-chart">
+                <span className="admin-stat-label">Site theme — saved for every visitor</span>
+                <div className="admin-themes" role="radiogroup" aria-label="Site theme">
+                  {Themes.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={theme === t.id}
+                      className={`admin-theme${theme === t.id ? " is-on" : ""}`}
+                      onClick={() => saveTheme(t.id)}
+                      disabled={busy}
+                    >
+                      <span className="admin-theme-emoji" aria-hidden="true">{t.emoji}</span>
+                      <span>{t.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="admin-list-head">
               <span>Guestbook</span>

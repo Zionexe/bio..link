@@ -11,6 +11,7 @@ import "./Intro.css";
 // ---------------------------------------------------------------------------
 
 const Word = "Zion";
+const Site = "zionexe.xyz"; // small spaced line under the name
 const LOAD_MS = 1600;
 
 export default function Intro({ onEnter, onExited, leaving }) {
@@ -73,15 +74,15 @@ export default function Intro({ onEnter, onExited, leaving }) {
           ))}
         </h1>
 
-        <div className="intro-load" aria-hidden="true">
-          <span className="intro-bar">
-            <span className="intro-bar-fill" style={{ transform: `scaleX(${progress / 100})` }} />
-          </span>
-          <span className="intro-count">{String(progress).padStart(3, "0")}</span>
-        </div>
-      </div>
+        <p className="intro-sub">{Site}</p>
 
-      <span className="intro-cta-label">click anywhere to enter</span>
+        <span className="intro-cta-label">
+          click anywhere to enter
+          <svg className="intro-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+            <path d="M12 5v14M6 13l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      </div>
     </div>
   );
 }

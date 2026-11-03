@@ -12,6 +12,8 @@
 // links, and a hidden "website" honeypot field only bots fill in.
 // ---------------------------------------------------------------------------
 
+import { checkAdmin, adminError, clientIp } from "./_auth.js";
+
 export const MAX_ENTRIES = 200;
 const NAME_MAX = 24;
 const MESSAGE_MAX = 280;
@@ -31,27 +33,23 @@ function clean(text, max) {
     .slice(0, max);
 }
 
-function clientIp(request) {
-  const h = request.headers;
-  return (h.get("x-real-ip") || h.get("x-forwarded-for") || "unknown").split(",")[0].trim();
-}
-
 /**
  * @param {Request} request
- * @param {{ list(): Promise<object[]>, add(entry: object): Promise<void>, remove(id: string): Promise<number>, claim(key: string, seconds: number): Promise<boolean> }} store
+ * @param {{ list(): Promise<object[]>, add(entry: object): Promise<void>, remove(id: string): Promise<number>, claim(key: string, seconds: number): Promise<boolean>, get(key: string): Promise<number>, incr(key: string, expireSeconds?: number): Promise<number> }} store
  * @param {{ adminToken?: string, rateLimitSeconds?: number }} options
  */
 export async function handleGuestbook(request, store, { adminToken, rateLimitSeconds = 60 } = {}) {
   try {
-    const isAdmin = () => {
-      const token = (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-      return Boolean(adminToken) && token === adminToken;
+    const denied = (result) => {
+      const { error, status } = adminError(result);
+      return json({ error }, status);
     };
 
     if (request.method === "GET") {
       // Admin panel login check: GET ?check=admin with the admin token.
       if (new URL(request.url).searchParams.get("check") === "admin") {
-        return isAdmin() ? json({ ok: true }) : json({ error: "wrong password" }, 401);
+        const result = await checkAdmin(request, store, adminToken);
+        return result === "ok" ? json({ ok: true }) : denied(result);
       }
       return json({ entries: await store.list() });
     }
@@ -81,7 +79,8 @@ export async function handleGuestbook(request, store, { adminToken, rateLimitSec
     }
 
     if (request.method === "DELETE") {
-      if (!isAdmin()) return json({ error: "unauthorized" }, 401);
+      const result = await checkAdmin(request, store, adminToken);
+      if (result !== "ok") return denied(result);
       const id = new URL(request.url).searchParams.get("id");
       if (!id) return json({ error: "add ?id=" }, 400);
       return json({ ok: true, removed: await store.remove(id) });
@@ -130,6 +129,22 @@ export function upstashStore(env = process.env) {
     },
     async claim(key, seconds) {
       return (await cmd("SET", key, "1", "NX", "EX", seconds)) === "OK";
+    },
+    // Counters (view counter, failed admin logins).
+    async get(key) {
+      return Number(await cmd("GET", key)) || 0;
+    },
+    async incr(key, expireSeconds) {
+      const n = await cmd("INCR", key);
+      if (expireSeconds && n === 1) await cmd("EXPIRE", key, expireSeconds);
+      return n;
+    },
+    // Plain text values (site settings).
+    async getText(key) {
+      return (await cmd("GET", key)) ?? null;
+    },
+    async setText(key, value) {
+      await cmd("SET", key, value);
     },
   };
 }

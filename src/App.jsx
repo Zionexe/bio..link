@@ -6,6 +6,11 @@ import { PlatformIndicators } from "./PlatformIcons";
 import LyricsCard from "./LyricsCard";
 import DynamicIsland from "./DynamicIsland";
 import Intro from "./Intro";
+import NetworkBackground from "./NetworkBackground";
+import { tilt } from "./tilt";
+import SeasonFx from "./SeasonFx";
+import { getTheme, availableTracks } from "./themes";
+import ThemeDecor from "./ThemeDecor";
 import Glass from "./Glass";
 import Portfolio from "./Portfolio";
 import Music from "./Music";
@@ -15,7 +20,7 @@ import Guestbook from "./Guestbook";
 import NotFound from "./NotFound";
 import AdminPanel from "./AdminPanel";
 import Confetti from "./Confetti";
-import { ContactButton, ContactSheet } from "./Contact";
+import { ContactButton, ContactSheet, ShareButton } from "./Contact";
 import Cursor from "./Cursor";
 import { PageTitle } from "./Text";
 import { DisplayName, Links, LocationText, Tracks, Ventures, GuestbookEndpoint, ContactEmail, SecretWord, AdminWord, ConfettiWord, ViewMilestones, DefaultCover } from "./links";
@@ -24,16 +29,23 @@ import "./mono.css";
 import "./extras.css";
 import "./polish.css";
 import "./motion.css";
+import "./fresh.css";
 //hello
 const DiscordId = "855589141064318977";
 // Line typed out under your name on the home page ("" hides it).
-const BioText = "Developer — Velocity · Valtrix · Getghosted · Astrix";
-const ViewsEndpoint = "https://views.ltut.lol/";
-// Profile picture + background photo (in /public). Set UsePhotoBackground
-// to false to go back to the video background.
+const BioText = "Developer — Valtrix · Getghosted · 404x";
+// View counter — api/views.js (same Upstash database as the guestbook).
+const ViewsEndpoint = "/api/views";
+// Site settings (seasonal theme, set in the admin panel) — api/settings.js.
+const SettingsEndpoint = "/api/settings";
+// Profile picture: your live Discord avatar (via Lanyard); PfpUrl is only
+// used if Discord can't be reached. Background options (in /public):
+//   "network" — interactive web of points & lines (src/NetworkBackground.jsx)
+//   "photo"   — BackgroundPhotoUrl
+//   "video"   — BannerVideoUrl
 const PfpUrl = "/pfp.jpg";
+const BackgroundMode = "network";
 const BackgroundPhotoUrl = "/bg.jpg";
-const UsePhotoBackground = true;
 const BannerVideoUrl = "https://res.cloudinary.com/dwrd1ukva/video/upload/v1782910854/a6ec44d6-a293-45f0-a642-c3c895df8c99_whh21w.mp4";
 
 // Easter-egg feature flags — flip to false to fully disable, no code removal needed.
@@ -75,7 +87,7 @@ function getCustomStatus(presence) {
 }
 
 // The site's pages, in tab order. `id` is also the URL hash (#music etc.).
-// Project detail pages (#velocity, #valtrix, …) live under the projects tab.
+// Project detail pages (#valtrix, #getghosted, …) live under the projects tab.
 // The guestbook tab only shows once its backend URL is set in links.js.
 const Pages = [
   { id: "profile", label: "home" },
@@ -104,9 +116,18 @@ function pageFromHash() {
   const id = window.location.hash.replace(/^#\/?/, "");
   if (!id) return "profile";
   if (id === "portfolio") return "links"; // old link
+  if (id === "astrix") return "404x"; // Astrix Studio is now 404x Shop
+  if (id === "velocity") return "projects"; // Velocity Shop closed
   if (Pages.some((p) => p.id === id) || Ventures.some((v) => v.id === id)) return id;
   return "notfound";
 }
+
+const StatusLabels = {
+  online: "online on discord",
+  idle: "idle",
+  dnd: "do not disturb",
+  offline: "currently offline",
+};
 
 const ActivityVerbs = { 0: "playing", 1: "streaming", 3: "watching", 5: "competing in" };
 
@@ -230,7 +251,7 @@ function useGlassLight(enabled) {
 // ---------------------------------------------------------------------------
 // ProfileUser — one Discord-linked row (avatar, status, tag, badges, status line)
 // ---------------------------------------------------------------------------
-function ProfileUser({ presence, name, avatar, fallbackName, badgeIds }) {
+function ProfileUser({ presence, name, avatar, fallbackName, badgeIds, className = "", ...rest }) {
   const avatarUrl = avatar || getDiscordAvatarUrl(presence?.discord_user) || "https://cdn.discordapp.com/embed/avatars/0.png";
   const username = name || presence?.discord_user?.global_name || presence?.discord_user?.username || fallbackName;
   const guildTag = getGuildTag(presence);
@@ -248,12 +269,12 @@ function ProfileUser({ presence, name, avatar, fallbackName, badgeIds }) {
     mainLine = `${spotify.song}`;
     secondaryLine = spotify.artist;
   } else {
-    mainLine = customStatus || activity || "";
+    mainLine = customStatus || activity || StatusLabels[presence?.discord_status] || "";
     secondaryLine = customStatus && activity ? activity : null;
   }
 
   return (
-    <Glass className={`duo-row${nameplateUrl ? " has-nameplate" : ""}`} glass={{ bezel: 20, refraction: 36 }}>
+    <Glass className={`duo-row${nameplateUrl ? " has-nameplate" : ""} ${className}`} glass={{ bezel: 20, refraction: 36 }} {...rest}>
       {nameplateUrl && <img className="nameplate-bg" src={nameplateUrl} alt="" />}
       <div className="avatar-wrap avatar-wrap-sm">
         <img className="avatar avatar-sm" src={avatarUrl} alt={username} />
@@ -283,26 +304,13 @@ function ProfileUser({ presence, name, avatar, fallbackName, badgeIds }) {
 // ---------------------------------------------------------------------------
 // VideoBackground — fixed full-viewport video, immune to zoom/scroll
 // ---------------------------------------------------------------------------
-// Giant outlined name scrolling behind everything.
-function BackgroundMarquee() {
-  const run = Array.from({ length: 6 }, () => DisplayName.toUpperCase()).join(" \u2014 ");
-  return (
-    <div className="bg-marquee" aria-hidden="true">
-      <div className="bg-marquee-track">
-        <span>{`${run} \u2014 `}</span>
-        <span>{`${run} \u2014 `}</span>
-      </div>
-    </div>
-  );
-}
-
 function VideoBackground() {
-  if (UsePhotoBackground) {
+  if (BackgroundMode === "network") return null; // rendered at the app root
+  if (BackgroundMode === "photo") {
     return (
       <>
         <div className="photo-bg" style={{ backgroundImage: `url(${BackgroundPhotoUrl})` }} />
         <div className="video-bg-overlay" />
-        <BackgroundMarquee />
       </>
     );
   }
@@ -517,7 +525,7 @@ function HeartOverlay({ onClose }) {
 
 export default function App() {
   const { data: presence } = useLanyard(DiscordId);
-  const { count: viewsCount, popups } = useViews(ViewsEndpoint);
+  const { count: viewsCount, counted: viewCounted, popups } = useViews(ViewsEndpoint);
 
   const [entered, setEntered] = useState(false);
   const [enterScreenMounted, setEnterScreenMounted] = useState(true);
@@ -534,6 +542,8 @@ export default function App() {
 
   const spotify = presence?.listening_to_spotify ? presence.spotify : null;
   const username = DisplayName;
+  // Discord avatar (animated ones play) — falls back to /pfp.jpg.
+  const discordAvatar = (presence?.discord_user && getDiscordAvatarUrl(presence.discord_user, 512)) || PfpUrl;
 
   // Which page is showing. Mirrored in the URL hash so /#portfolio links
   // straight to the portfolio page.
@@ -599,6 +609,37 @@ export default function App() {
     };
   }, [activeTab, entered]);
 
+  // Tab bar hover: a glass pill glides back and forth to the tab under the
+  // mouse. It slides out from the active tab when the mouse enters the bar
+  // and fades away when it leaves. Mouse only (DOM writes, no re-renders).
+  const hoverPill = useRef(null);
+  const onTabsMove = useCallback((e) => {
+    const pill = hoverPill.current;
+    if (!pill || e.pointerType !== "mouse") return;
+    const tab = e.target instanceof Element ? e.target.closest(".page-tab") : null;
+    if (!tab) return;
+    const place = (el) => {
+      pill.style.width = `${el.offsetWidth}px`;
+      pill.style.transform = `translateX(${el.offsetLeft}px)`;
+    };
+    if (pill.dataset.on !== "1") {
+      pill.dataset.on = "1";
+      const from = tab.parentElement.querySelector(".page-tab.is-active") || tab;
+      pill.style.transition = "none";
+      place(from);
+      void pill.offsetWidth; // commit the start position before animating
+      pill.style.transition = "";
+    }
+    pill.style.opacity = "1";
+    place(tab);
+  }, []);
+  const onTabsLeave = useCallback(() => {
+    const pill = hoverPill.current;
+    if (!pill) return;
+    pill.dataset.on = "";
+    pill.style.opacity = "0";
+  }, []);
+
   // Business inquiries sheet.
   const [contactOpen, setContactOpen] = useState(false);
   const openContact = useCallback(() => setContactOpen(true), []);
@@ -619,6 +660,50 @@ export default function App() {
     toastTimer.current = setTimeout(() => setToast(null), ms);
   }, []);
   useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  // Seasonal theme: saved on the server (admin panel), same for everyone.
+  // ?theme=<id> in the URL previews one without saving.
+  const previewTheme = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("theme") : null;
+  const [themeId, setThemeId] = useState(previewTheme || "default");
+  useEffect(() => {
+    if (previewTheme) return;
+    fetch(SettingsEndpoint)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d?.theme) setThemeId(d.theme); })
+      .catch(() => {});
+  }, [previewTheme]);
+  const theme = getTheme(themeId);
+  // Holiday playlist: the theme's songs whose files exist replace the normal ones.
+  const [holidaySongs, setHolidaySongs] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    availableTracks(theme).then((list) => { if (!cancelled) setHolidaySongs(list); });
+    return () => { cancelled = true; };
+  }, [theme]);
+  const playlist = holidaySongs.length ? holidaySongs : Tracks;
+  const playlistKey = holidaySongs.length ? theme.id : "default";
+  // Read by the secret-song key handler (which is set up once).
+  const playlistRef = useRef(playlist);
+  useEffect(() => { playlistRef.current = playlist; }, [playlist]);
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.theme = theme.id;
+    if (theme.accent) {
+      root.style.setProperty("--accent-rgb", theme.accent);
+      root.style.setProperty("--accent2-rgb", theme.accent2 || theme.accent);
+      root.style.setProperty("--theme-emoji", JSON.stringify(` ${theme.emoji}`));
+    } else {
+      root.style.removeProperty("--accent-rgb");
+      root.style.removeProperty("--accent2-rgb");
+      root.style.removeProperty("--theme-emoji");
+    }
+  }, [theme]);
+  // Greeting toast once the visitor is in (and again if the admin switches).
+  useEffect(() => {
+    if (!entered || !theme.greeting) return;
+    const t = setTimeout(() => showToast(theme.greeting, 4200), 900);
+    return () => clearTimeout(t);
+  }, [entered, theme, showToast]);
 
   // Confetti burst — re-keyed so it can fire again.
   const [confetti, setConfetti] = useState(0);
@@ -641,11 +726,11 @@ export default function App() {
         return;
       }
       // Secret songs: each track's `secret` word plays it.
-      const song = Tracks.findIndex((t) => t.secret && buffer.endsWith(t.secret.toLowerCase()));
+      const song = playlistRef.current.findIndex((t) => t.secret && buffer.endsWith(t.secret.toLowerCase()));
       if (song >= 0) {
         buffer = "";
         playerApi.current?.play(song);
-        showToast(`secret track — ${Tracks[song].name}`);
+        showToast(`secret track — ${playlistRef.current[song].name}`);
         return;
       }
       if (ConfettiWord && buffer.endsWith(ConfettiWord.toLowerCase())) {
@@ -672,7 +757,7 @@ export default function App() {
   // View milestones: whoever lands on 100, 1,000, 5,000… gets confetti.
   const celebrated = useRef(false);
   useEffect(() => {
-    if (!entered || celebrated.current || !viewsCount) return;
+    if (!entered || celebrated.current || !viewsCount || !viewCounted) return;
     const last = ViewMilestones[ViewMilestones.length - 1] || Infinity;
     const hit = ViewMilestones.includes(viewsCount) || (viewsCount > last && viewsCount % 10000 === 0);
     if (!hit) return;
@@ -682,7 +767,7 @@ export default function App() {
       showToast(`you're visitor #${viewsCount.toLocaleString()} — milestone`, 6000);
     }, 1400);
     return () => clearTimeout(t);
-  }, [entered, viewsCount, fireConfetti, showToast]);
+  }, [entered, viewsCount, viewCounted, fireConfetti, showToast]);
 
   // Number keys jump between pages (ignored while typing).
   useEffect(() => {
@@ -724,26 +809,13 @@ export default function App() {
   useGlassLight(entered);
 
   useEffect(() => {
-    const block = (e) => { e.preventDefault(); return false; };
+    // Right-click is blocked on images/video only (pfp, background, covers),
+    // so visitors can still copy links and text.
+    const block = (e) => {
+      if (e.target instanceof Element && e.target.closest("img, video, .photo-bg")) e.preventDefault();
+    };
     document.addEventListener("contextmenu", block, true);
     return () => document.removeEventListener("contextmenu", block, true);
-  }, []);
-
-  useEffect(() => {
-    const blockZoom = (e) => {
-      if (e.ctrlKey && (e.key === "+" || e.key === "-" || e.key === "=" || e.key === "0")) {
-        e.preventDefault();
-      }
-    };
-    const blockWheelZoom = (e) => {
-      if (e.ctrlKey) e.preventDefault();
-    };
-    document.addEventListener("keydown", blockZoom);
-    document.addEventListener("wheel", blockWheelZoom, { passive: false });
-    return () => {
-      document.removeEventListener("keydown", blockZoom);
-      document.removeEventListener("wheel", blockWheelZoom);
-    };
   }, []);
 
   // "device" / "heart" easter eggs — typed anywhere on the page.
@@ -799,6 +871,8 @@ export default function App() {
   // keeps its DOM node (and can transition out) when the page mounts.
   return (
     <>
+    {BackgroundMode === "network" && <NetworkBackground accent={theme.accent} accent2={theme.accent2} />}
+    <SeasonFx theme={theme} />
     {entered && (
     <div className={`page${egg ? " is-egg" : ""}`}>
       <VideoBackground />
@@ -817,65 +891,80 @@ export default function App() {
         ) : view === "notfound" ? (
           <NotFound onHome={() => goTo("profile")} />
         ) : view === "music" ? (
-          <Music tracks={Tracks} player={playerState} playerApi={playerApi} spotify={spotify} />
+          <Music tracks={playlist} player={playerState} playerApi={playerApi} spotify={spotify} />
         ) : (
         <div key="profile" className={`card pf-card home-card${cardVisible ? " card-entered" : ""}`}>
-        <div className="hero-block">
-          <PageTitle text={username} />
-          {BioText && (
-            <div className="hero-bio">
-              <Typewriter text={BioText} />
+        <div className="profile-card tilt" {...tilt(7)}>
+          <ThemeDecor decor={theme.decor} />
+          <div className="pc-top">
+            <div className="avatar-wrap">
+              <img className="avatar" src={discordAvatar} alt={username} />
+              {getAvatarDecorationUrl(presence) && (
+                <img className="avatar-decoration" src={getAvatarDecorationUrl(presence)} alt="" />
+              )}
+              <StatusDot status={presence?.discord_status} />
             </div>
+            <div className="pc-pills">
+              <span className="pc-pill" aria-label="page views">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" aria-hidden="true">
+                  <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                  <circle cx="12" cy="12" r="3" fill="currentColor" />
+                </svg>
+                {viewsCount === null ? "—" : <CountUp value={viewsCount} delay={600} />}
+                {popups.map((popup) => (
+                  <span key={popup.id} className="view-popup">+1</span>
+                ))}
+              </span>
+              {LocationText && (
+                <span className="pc-pill">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" aria-hidden="true">
+                    <path d="M12 21s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                    <circle cx="12" cy="9" r="2.3" fill="currentColor" />
+                  </svg>
+                  {LocationText}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="pc-name-line">
+            <PageTitle text={username} />
+            <Badges ids={["crown", "developer", "verified"]} />
+            {theme.badge && <span className="theme-badge" aria-hidden="true">{theme.badge}</span>}
+          </div>
+          {BioText && (
+            <p className="pc-bio">
+              <Typewriter text={BioText} prefix="" cursorChar="|" />
+            </p>
           )}
+
+          <div className="icon-row pc-icons">
+            {Links.map((icon) => (
+              <a
+                key={icon.id}
+                href={icon.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="icon-link"
+                aria-label={icon.id}
+              >
+                <img src={icon.src} alt={icon.id} className="icon-img" />
+              </a>
+            ))}
+            <ShareButton title={DisplayName} onCopied={() => showToast("link copied")} />
+            <ContactButton onOpen={openContact} />
+          </div>
         </div>
 
         <ProfileUser
           presence={presence}
           name={DisplayName}
-          avatar={PfpUrl}
+          avatar={discordAvatar}
           fallbackName={DisplayName}
-          badgeIds={["crown", "developer", "verified"]}
+          badgeIds={[]}
+          className="tilt"
+          {...tilt(9)}
         />
-
-        <div className="meta-row">
-          <span className="meta-item" aria-label="page views">
-            <svg className="meta-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-              <circle cx="12" cy="12" r="3" fill="currentColor" />
-            </svg>
-            <span><CountUp value={viewsCount} delay={600} /></span>
-            {popups.map((popup) => (
-              <span key={popup.id} className="view-popup">+1</span>
-            ))}
-          </span>
-          <span className="meta-item">
-            <svg className="meta-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 21s7-7.2 7-12a7 7 0 1 0-14 0c0 4.8 7 12 7 12Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-              <circle cx="12" cy="9" r="2.3" fill="currentColor" />
-            </svg>
-            <span>{LocationText}</span>
-          </span>
-        </div>
-
-        <div className="icon-row">
-        {Links.map((icon) => (
-          <a
-            key={icon.id}
-            href={icon.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="icon-link"
-            aria-label={icon.id}
-          >
-            <img
-              src={icon.src}
-              alt={icon.id}
-              className="icon-img"
-            />
-          </a>
-        ))}
-        <ContactButton onOpen={openContact} />
-      </div>
 
         <div className="home-projects">
           {Ventures.map((v) => (
@@ -900,7 +989,10 @@ export default function App() {
         className={`page-tabs${indicatorReady ? " has-indicator" : ""}`}
         aria-label="Pages"
         glass={{ bezel: 14, refraction: 24 }}
+        onPointerMove={onTabsMove}
+        onPointerLeave={onTabsLeave}
       >
+        <span ref={hoverPill} className="tab-hover" aria-hidden="true" />
         <span className="tab-indicator" aria-hidden="true" />
         {Pages.map(({ id, label }) => (
           <button
@@ -924,7 +1016,7 @@ export default function App() {
       {egg && <div className="egg-flash" aria-hidden="true" />}
       {confetti > 0 && <Confetti key={`confetti-${confetti}`} onDone={() => setConfetti(0)} />}
 
-      <DynamicIsland tracks={Tracks} cover={DefaultCover} apiRef={playerApi} onStateChange={setPlayerState} />
+      <DynamicIsland key={`player-${playlistKey}`} tracks={playlist} cover={presence?.discord_user ? discordAvatar : DefaultCover} apiRef={playerApi} onStateChange={setPlayerState} />
       {DeviceEasterEggEnabled && deviceOverlay && <DeviceOverlay />}
       {HeartEasterEggEnabled && heartOverlay && <HeartOverlay onClose={() => setHeartOverlay(false)} />}
     </div>
@@ -937,7 +1029,8 @@ export default function App() {
       discordUsername={presence?.discord_user?.username}
       email={ContactEmail}
     />
-    <AdminPanel open={adminOpen} onClose={closeAdmin} endpoint={GuestbookEndpoint} views={viewsCount} />
+    <AdminPanel open={adminOpen} onClose={closeAdmin} endpoint={GuestbookEndpoint} viewsEndpoint={ViewsEndpoint} views={viewsCount}
+      settingsEndpoint={SettingsEndpoint} theme={themeId} onThemeChange={setThemeId} />
     <Cursor />
     </>
   );

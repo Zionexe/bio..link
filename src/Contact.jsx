@@ -24,6 +24,35 @@ export function ContactButton({ onOpen, wide = false }) {
   );
 }
 
+// Share — on phones opens the native share sheet; on desktop copies the
+// site link and calls onCopied (the page shows a "link copied" toast).
+export function ShareButton({ title, onCopied }) {
+  const share = async () => {
+    const url = `${window.location.origin}/`;
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    if (touch && navigator.share) {
+      try {
+        await navigator.share({ title, url });
+        return;
+      } catch (err) {
+        if (err?.name === "AbortError") return; // closed the sheet
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      onCopied?.();
+    } catch { /* clipboard blocked */ }
+  };
+  return (
+    <button type="button" className="icon-link share-btn" onClick={share} aria-label="Share this page">
+      <svg className="icon-img" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3v12M7 8l5-5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </button>
+  );
+}
+
 export function ContactSheet({ open, onClose, discordHref, discordUsername, email }) {
   const [copied, setCopied] = useState(false);
   const closeRef = useRef(null);

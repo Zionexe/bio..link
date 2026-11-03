@@ -29,18 +29,6 @@ export const Links = [
 // it to show the server's icon and live member counts.
 export const Ventures = [
   {
-    id: "velocity",
-    tab: "velocity",
-    name: "Velocity Shop",
-    kicker: "Velocity Leaks Shop",
-    tagline: "Quality. Performance. Velocity.",
-    description:
-      "Premium FiveM assets, vehicles, clothing, scripts, and server-ready resources — built to elevate your server.",
-    features: ["FiveM assets", "vehicles", "clothing", "scripts", "server-ready"],
-    invite: "velocityshop",
-    links: [{ label: "Join the Discord", href: "https://discord.gg/velocityshop", kind: "discord" }],
-  },
-  {
     id: "valtrix",
     tab: "valtrix",
     name: "Valtrix",
@@ -69,13 +57,13 @@ export const Ventures = [
     ],
   },
   {
-    id: "astrix",
-    tab: "astrix",
-    name: "Astrix Studio",
-    kicker: "studio",
+    id: "404x",
+    tab: "404x",
+    name: "404x Shop",
+    kicker: "shop",
     tagline: "Made by developers, for you.",
-    invite: "Astrixstudio",
-    links: [{ label: "Join the Discord", href: "https://discord.gg/Astrixstudio", kind: "discord" }],
+    invite: "404x",
+    links: [{ label: "Join the Discord", href: "https://discord.gg/404x", kind: "discord" }],
   },
 ];
 

@@ -25,9 +25,8 @@ const Arrow = () => (
 );
 
 // 3D tilt toward the pointer, with a glare spot that follows it.
-const canTilt = () =>
-  window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
-  !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+// Follows the mouse, so it stays on even with reduced motion turned on.
+const canTilt = () => window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
 function onTiltMove(e) {
   if (!canTilt()) return;

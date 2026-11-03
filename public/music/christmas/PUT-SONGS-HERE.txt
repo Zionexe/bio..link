@@ -1,0 +1,8 @@
+Put this theme's songs in this folder with these exact file names:
+
+  all-i-want-for-christmas-is-you.mp3    <- All I Want for Christmas Is You - Mariah Carey
+  last-christmas.mp3    <- Last Christmas - Wham!
+  rockin-around-the-christmas-tree.mp3    <- Rockin' Around the Christmas Tree - Brenda Lee
+
+Songs whose file isn't here are skipped. To add more songs, add them to
+the "christmas" theme's tracks list in src/themes.js.
