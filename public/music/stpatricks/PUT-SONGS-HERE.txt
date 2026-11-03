@@ -1,7 +1,0 @@
-Put this theme's songs in this folder with these exact file names:
-
-  im-shipping-up-to-boston.mp3    <- I'm Shipping Up to Boston - Dropkick Murphys
-  jump-around.mp3    <- Jump Around - House of Pain
-
-Songs whose file isn't here are skipped. To add more songs, add them to
-the "stpatricks" theme's tracks list in src/themes.js.
