@@ -1,7 +1,0 @@
-Put this theme's songs in this folder with these exact file names:
-
-  family-affair.mp3    <- Family Affair - Mary J. Blige
-  thank-you.mp3    <- Thank You - Dido
-
-Songs whose file isn't here are skipped. To add more songs, add them to
-the "thanksgiving" theme's tracks list in src/themes.js.
