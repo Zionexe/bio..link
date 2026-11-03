@@ -1,7 +1,0 @@
-Put this theme's songs in this folder with these exact file names:
-
-  party-in-the-usa.mp3    <- Party in the U.S.A. - Miley Cyrus
-  firework.mp3    <- Firework - Katy Perry
-
-Songs whose file isn't here are skipped. To add more songs, add them to
-the "fourth" theme's tracks list in src/themes.js.
