@@ -1,0 +1,7 @@
+Put this theme's songs in this folder with these exact file names:
+
+  best-part.mp3    <- Best Part - Daniel Caesar ft. H.E.R.
+  adore-you.mp3    <- Adore You - Harry Styles
+
+Songs whose file isn't here are skipped. To add more songs, add them to
+the "valentines" theme's tracks list in src/themes.js.
