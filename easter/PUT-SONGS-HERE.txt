@@ -1,7 +1,0 @@
-Put this theme's songs in this folder with these exact file names:
-
-  here-comes-peter-cottontail.mp3    <- Here Comes Peter Cottontail - Gene Autry
-  walking-on-sunshine.mp3    <- Walking on Sunshine - Katrina and the Waves
-
-Songs whose file isn't here are skipped. To add more songs, add them to
-the "easter" theme's tracks list in src/themes.js.
